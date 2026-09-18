@@ -1,0 +1,2581 @@
+<!DOCTYPE html>
+<html lang="da" class="h-full bg-slate-950 text-slate-100 antialiased">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0f172a">
+  <title>A/S Nortvig - Materialer, Retur & Kontrol</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            nortvig: {
+              50: '#fff7ed',
+              100: '#ffedd5',
+              400: '#fb923c',
+              500: '#f97316',
+              600: '#ea580c',
+              700: '#c2410c',
+              dark: '#0f172a',
+              card: '#1e293b',
+              border: '#334155'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    body {
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    input, textarea, select {
+      user-select: auto;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #ea580c;
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.15); opacity: 0.3; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .recording-pulse {
+      animation: pulse-ring 1.5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+    }
+    @keyframes badge-glow {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.85; transform: scale(1.03); }
+    }
+    .glow-pulse {
+      animation: badge-glow 2s ease-in-out infinite;
+    }
+    .custom-toast {
+      animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body class="min-h-full flex flex-col items-center justify-start bg-slate-950 font-sans p-0 sm:p-4 md:p-6 select-none transition-all duration-300">
+
+  <!-- Main Container: Dynamically resizes to max-w-5xl for Admin/Dashboard or max-w-md/xl for mobile view -->
+  <div id="app-shell" class="w-full max-w-md md:max-w-xl transition-all duration-300 min-h-screen sm:min-h-[920px] bg-slate-900 sm:rounded-3xl border sm:border-slate-800 shadow-2xl flex flex-col overflow-hidden relative">
+
+    <!-- Top Status / Branding Bar -->
+    <header class="bg-slate-900/95 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40 px-4 py-3.5 flex items-center justify-between">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="setAppMode('order')">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-700 flex items-center justify-center font-black text-white text-xl shadow-lg shadow-orange-600/30 tracking-tight">
+          N
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-orange-400">A/S Nortvig</span>
+            <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            <span id="header-mode-badge" class="text-[10px] text-slate-400 font-medium">Pladsportal</span>
+          </div>
+          <h1 id="header-main-title" class="text-base font-extrabold text-white leading-tight">Materialer & Retur</h1>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-2">
+        <!-- Mode Switch: Plads vs Admin Panel -->
+        <button id="top-admin-toggle" onclick="toggleAdminView()" title="Skift til Projektleder & Admin Panel"
+          class="flex items-center space-x-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-bold active:scale-95 transition">
+          <i data-lucide="layout-dashboard" class="w-4 h-4 text-orange-400"></i>
+          <span class="hidden sm:inline">Admin</span>
+          <span id="discrepancy-badge-header" class="px-1.5 py-0.2 rounded-full bg-red-600 text-white text-[10px] font-black">2</span>
+        </button>
+
+        <!-- 3-Way Match Shortcut Button -->
+        <button onclick="toggleThreeWayModal(true)" title="Åbn Epikur 3-vejs Match simulation"
+          class="hidden xs:flex items-center space-x-1 bg-slate-800 hover:bg-slate-700 border border-orange-500/40 text-orange-400 px-2.5 py-1.5 rounded-xl text-xs font-semibold active:scale-95 transition">
+          <i data-lucide="shield-check" class="w-4 h-4 text-orange-400"></i>
+          <span class="hidden sm:inline">Match</span>
+        </button>
+
+        <!-- Order / Returns history shortcut -->
+        <button onclick="switchScreen('screen-history')" title="Se historik"
+          class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 active:scale-95 transition relative">
+          <i data-lucide="clock" class="w-4 h-4"></i>
+          <span id="order-badge" class="hidden absolute -top-1 -right-1 w-4 h-4 bg-orange-500 text-[10px] font-bold text-white rounded-full flex items-center justify-center">0</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Top Mode Selector: NY BESTILLING vs. RETURVARE (Only visible in Plads view) -->
+    <div id="mode-tab-bar" class="bg-slate-950 px-4 py-2 border-b border-slate-800 flex items-center justify-between">
+      <div class="grid grid-cols-2 gap-1.5 w-full bg-slate-900 p-1 rounded-2xl border border-slate-800">
+        <!-- Order Mode Button -->
+        <button id="mode-btn-order" onclick="setAppMode('order')"
+          class="flex items-center justify-center space-x-2 py-2.5 px-3 rounded-xl font-bold text-xs transition bg-orange-600 text-white shadow-md">
+          <i data-lucide="shopping-cart" class="w-4 h-4"></i>
+          <span>Ny Bestilling</span>
+        </button>
+
+        <!-- Return Mode Button -->
+        <button id="mode-btn-return" onclick="setAppMode('return')"
+          class="flex items-center justify-center space-x-2 py-2.5 px-3 rounded-xl font-bold text-xs transition text-slate-400 hover:text-white">
+          <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+          <span>Returvare / Send retur</span>
+          <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Progress Indicator Bar (For Wizard steps) -->
+    <div id="progress-bar-wrapper" class="bg-slate-900 px-4 py-2 border-b border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+      <div class="flex items-center space-x-2 w-full">
+        <div id="step-dot-1" class="flex-1 h-1.5 rounded-full bg-orange-500 transition-all duration-300"></div>
+        <div id="step-dot-2" class="flex-1 h-1.5 rounded-full bg-slate-700 transition-all duration-300"></div>
+        <div id="step-dot-3" class="flex-1 h-1.5 rounded-full bg-slate-700 transition-all duration-300"></div>
+        <div id="step-dot-4" class="flex-1 h-1.5 rounded-full bg-slate-700 transition-all duration-300"></div>
+      </div>
+    </div>
+
+    <!-- Active Case/Supplier Subheader (visible in step 2, 3) -->
+    <div id="active-summary-banner" class="hidden bg-slate-800/90 border-b border-slate-700/60 px-4 py-2 flex items-center justify-between text-xs">
+      <div class="flex items-center space-x-2 overflow-hidden">
+        <span id="banner-action-type" class="px-2 py-0.5 rounded text-[10px] font-bold bg-orange-500/20 text-orange-300">BESTILLING</span>
+        <span class="text-slate-400">Sag:</span>
+        <span id="banner-case-name" class="font-bold text-white truncate max-w-[140px]">Sag 2401</span>
+        <span class="text-slate-500">|</span>
+        <span id="banner-supplier-name" class="font-bold text-orange-400 truncate">Vælg leverandør</span>
+      </div>
+      <button onclick="resetFlowTo(1)" class="text-orange-400 hover:text-orange-300 underline text-[11px] font-medium ml-2 shrink-0">
+        Skift
+      </button>
+    </div>
+
+    <!-- Toast Notification Banner -->
+    <div id="global-toast" class="hidden fixed bottom-20 left-1/2 -translate-x-1/2 z-50 max-w-sm w-[92%] p-3.5 rounded-2xl shadow-2xl border flex items-center space-x-3 custom-toast bg-slate-900 border-slate-700 text-white">
+      <div id="toast-icon-box" class="w-8 h-8 rounded-xl flex items-center justify-center shrink-0">
+        <i id="toast-icon" data-lucide="check" class="w-4 h-4"></i>
+      </div>
+      <div class="flex-1 text-xs">
+        <div id="toast-title" class="font-bold text-white">Advisering sendt</div>
+        <div id="toast-desc" class="text-slate-300 text-[11px]">Handlingen er udført</div>
+      </div>
+      <button onclick="hideToast()" class="text-slate-400 hover:text-white p-1">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-y-auto p-4 flex flex-col space-y-4 pb-24">
+
+      <!-- ========================================================================= -->
+      <!-- SCREEN 1: VÆLG SAG (Case Selector) -->
+      <!-- ========================================================================= -->
+      <section id="screen-case" class="flex-col space-y-4 flex">
+        <div class="pt-1">
+          <div class="flex items-center justify-between mb-2">
+            <span id="step1-badge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-orange-500/10 text-orange-400 border border-orange-500/20">
+              Trin 1 af 3
+            </span>
+            <div id="flow-indicator-tag" class="text-xs font-bold text-slate-400 flex items-center space-x-1">
+              <i data-lucide="shopping-bag" class="w-3.5 h-3.5 text-orange-400"></i>
+              <span id="flow-indicator-label">Ny Bestilling</span>
+            </div>
+          </div>
+          <h2 id="case-screen-title" class="text-2xl font-black text-white tracking-tight">Hvilken sag gælder det?</h2>
+          <p id="case-screen-subtitle" class="text-sm text-slate-400 mt-0.5">Vælg fra dine aktive byggepladser eller søg sagsnr.</p>
+        </div>
+
+        <!-- Search Bar with big clear button -->
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+            <i data-lucide="search" class="w-5 h-5"></i>
+          </div>
+          <input type="text" id="case-search-input" oninput="filterCases()" placeholder="Søg sagsnr., by eller pladsnavn..."
+            class="w-full pl-11 pr-10 py-3.5 bg-slate-800/90 border-2 border-slate-700 focus:border-orange-500 rounded-2xl text-white placeholder-slate-400 text-base font-medium shadow-inner focus:outline-none transition">
+          <button id="case-search-clear" onclick="clearCaseSearch()" class="hidden absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <!-- Quick filter chips -->
+        <div class="flex items-center space-x-2 overflow-x-auto pb-1 text-xs no-scrollbar">
+          <span class="text-slate-500 shrink-0 font-medium">Hurtig:</span>
+          <button onclick="quickFilterCases('alle')" class="chip-filter active px-3 py-1.5 rounded-xl bg-orange-600 text-white font-bold shrink-0 transition">Alle sager</button>
+          <button onclick="quickFilterCases('Aarhus')" class="chip-filter px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold shrink-0 border border-slate-700">Aarhus</button>
+          <button onclick="quickFilterCases('Erhverv')" class="chip-filter px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold shrink-0 border border-slate-700">Erhverv</button>
+          <button onclick="quickFilterCases('Bolig')" class="chip-filter px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold shrink-0 border border-slate-700">Bolig</button>
+        </div>
+
+        <!-- Case Cards List -->
+        <div id="cases-list" class="space-y-2.5 pt-1">
+          <!-- Cases rendered dynamically via JavaScript -->
+        </div>
+
+        <!-- Custom Case Fallback -->
+        <div class="mt-4 p-4 rounded-2xl bg-slate-800/40 border border-dashed border-slate-700 text-center">
+          <p class="text-xs text-slate-400">Mangler din sag på listen?</p>
+          <button onclick="promptManualCase()" class="mt-2 text-xs font-bold text-orange-400 hover:text-orange-300 flex items-center justify-center space-x-1 mx-auto">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+            <span>Indtast sagsnr. manuelt</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- SCREEN 2: VÆLG LEVERANDØR (Supplier Selection) -->
+      <!-- ========================================================================= -->
+      <section id="screen-supplier" class="hidden flex-col space-y-4">
+        <div class="flex items-center justify-between pt-1">
+          <div>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-orange-500/10 text-orange-400 border border-orange-500/20 mb-2">
+              Trin 2 af 3
+            </span>
+            <h2 id="supplier-screen-title" class="text-2xl font-black text-white tracking-tight">Hvilken leverandør?</h2>
+            <p id="supplier-screen-subtitle" class="text-sm text-slate-400 mt-0.5">Vælg trælast eller leverandør</p>
+          </div>
+          <button onclick="switchScreen('screen-case')" class="p-2 text-slate-400 hover:text-white bg-slate-800 rounded-xl border border-slate-700">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <!-- Selected Case Pill -->
+        <div class="p-3 bg-slate-800/80 border border-slate-700 rounded-xl flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 rounded-lg bg-orange-500/20 text-orange-400 flex items-center justify-center font-bold text-sm">
+              <i data-lucide="map-pin" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <div class="text-xs text-slate-400">Valgt byggeplads:</div>
+              <div id="supplier-screen-case-info" class="text-sm font-bold text-white">Sag 2401 - Risskov Strandvej</div>
+            </div>
+          </div>
+          <button onclick="switchScreen('screen-case')" class="text-xs text-orange-400 font-semibold hover:underline">Skift</button>
+        </div>
+
+        <!-- 4 Big Distinct Supplier Cards -->
+        <div class="grid grid-cols-1 gap-3 pt-1">
+          
+          <!-- BYGMA -->
+          <button onclick="selectSupplier('Bygma', 'bygma@nortvig-ordrer.dk', 'Tømmer, reglar, gips & isolering')"
+            class="supplier-card group text-left p-4 rounded-2xl bg-gradient-to-r from-slate-800 to-slate-800/90 border-2 border-slate-700 hover:border-red-500 active:scale-[0.98] transition shadow-lg relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-red-600/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+            <div class="flex items-start justify-between">
+              <div class="flex items-center space-x-3.5">
+                <div class="w-14 h-14 rounded-2xl bg-red-600 flex items-center justify-center font-black text-white text-xl shadow-md tracking-wider">
+                  BYGMA
+                </div>
+                <div>
+                  <div class="flex items-center space-x-2">
+                    <h3 class="text-xl font-black text-white group-hover:text-red-400 transition">BYGMA</h3>
+                    <span class="bg-red-500/20 text-red-300 text-[10px] font-bold px-2 py-0.5 rounded-md border border-red-500/30">Hovedaftale</span>
+                  </div>
+                  <p class="text-xs text-slate-400 mt-1">Trælast, isolering, tagplader & plader</p>
+                  <p class="text-[11px] text-emerald-400 font-medium mt-1 flex items-center">
+                    <i data-lucide="check" class="w-3.5 h-3.5 mr-1"></i> <span class="supplier-benefit-text">Direkte mail-ordre & rabataftale</span>
+                  </p>
+                </div>
+              </div>
+              <div class="w-8 h-8 rounded-full bg-slate-700/50 flex items-center justify-center text-slate-400 group-hover:text-white group-hover:bg-red-600 transition">
+                <i data-lucide="chevron-right" class="w-5 h-5"></i>
+              </div>
+            </div>
+          </button>
+
+          <!-- STARK -->
+          <button onclick="selectSupplier('STARK', 'stark@nortvig-ordrer.dk', 'Byggematerialer, værktøj & beklædning')"
+            class="supplier-card group text-left p-4 rounded-2xl bg-gradient-to-r from-slate-800 to-slate-800/90 border-2 border-slate-700 hover:border-amber-500 active:scale-[0.98] transition shadow-lg relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-orange-600/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+            <div class="flex items-start justify-between">
+              <div class="flex items-center space-x-3.5">
+                <div class="w-14 h-14 rounded-2xl bg-amber-500 flex items-center justify-center font-black text-slate-950 text-xl shadow-md tracking-wider">
+                  STARK
+                </div>
+                <div>
+                  <div class="flex items-center space-x-2">
+                    <h3 class="text-xl font-black text-white group-hover:text-amber-400 transition">STARK</h3>
+                    <span class="bg-amber-500/20 text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded-md border border-amber-500/30">Drive-in & Lager</span>
+                  </div>
+                  <p class="text-xs text-slate-400 mt-1">Hurtig afhentning, el-værktøj & fittings</p>
+                  <p class="text-[11px] text-emerald-400 font-medium mt-1 flex items-center">
+                    <i data-lucide="check" class="w-3.5 h-3.5 mr-1"></i> <span class="supplier-benefit-text">Tømrer-konto aktiv (Aarhus C & N)</span>
+                  </p>
+                </div>
+              </div>
+              <div class="w-8 h-8 rounded-full bg-slate-700/50 flex items-center justify-center text-slate-400 group-hover:text-white group-hover:bg-amber-500 group-hover:text-slate-950 transition">
+                <i data-lucide="chevron-right" class="w-5 h-5"></i>
+              </div>
+            </div>
+          </button>
+
+          <!-- XL-BYG -->
+          <button onclick="selectSupplier('XL-BYG', 'xlbyg@nortvig-ordrer.dk', 'Tømmerhandel, døre & vinduer')"
+            class="supplier-card group text-left p-4 rounded-2xl bg-gradient-to-r from-slate-800 to-slate-800/90 border-2 border-slate-700 hover:border-blue-500 active:scale-[0.98] transition shadow-lg relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-blue-600/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+            <div class="flex items-start justify-between">
+              <div class="flex items-center space-x-3.5">
+                <div class="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center font-black text-white text-base shadow-md tracking-wider">
+                  XL-BYG
+                </div>
+                <div>
+                  <div class="flex items-center space-x-2">
+                    <h3 class="text-xl font-black text-white group-hover:text-blue-400 transition">XL-BYG</h3>
+                    <span class="bg-blue-500/20 text-blue-300 text-[10px] font-bold px-2 py-0.5 rounded-md border border-blue-500/30">Lokalpartner</span>
+                  </div>
+                  <p class="text-xs text-slate-400 mt-1">Trælast, tag, facade & udvendigt</p>
+                  <p class="text-[11px] text-emerald-400 font-medium mt-1 flex items-center">
+                    <i data-lucide="check" class="w-3.5 h-3.5 mr-1"></i> <span class="supplier-benefit-text">Kranbil & retur-opsamling</span>
+                  </p>
+                </div>
+              </div>
+              <div class="w-8 h-8 rounded-full bg-slate-700/50 flex items-center justify-center text-slate-400 group-hover:text-white group-hover:bg-blue-600 transition">
+                <i data-lucide="chevron-right" class="w-5 h-5"></i>
+              </div>
+            </div>
+          </button>
+
+          <!-- WÜRTH (Fremhævet fast leverandør af skruer & befæstigelse) -->
+          <button onclick="selectSupplier('Würth', 'ordre@wuerth.dk', 'Fast leverandør af skruer & befæstigelse')"
+            class="supplier-card group text-left p-4 rounded-2xl bg-gradient-to-r from-red-950/40 via-slate-800 to-slate-800/90 border-2 border-red-500/60 hover:border-red-400 active:scale-[0.98] transition shadow-xl relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-28 h-28 bg-red-600/20 rounded-full blur-2xl -mr-10 -mt-10"></div>
+            <div class="flex items-start justify-between">
+              <div class="flex items-center space-x-3.5">
+                <div class="w-14 h-14 rounded-2xl bg-red-700 border-2 border-red-500 flex flex-col items-center justify-center text-white shadow-md">
+                  <span class="font-black text-xs uppercase tracking-tighter">WÜRTH</span>
+                  <i data-lucide="wrench" class="w-4 h-4 mt-0.5"></i>
+                </div>
+                <div>
+                  <div class="flex items-center space-x-2">
+                    <h3 class="text-xl font-black text-white group-hover:text-red-400 transition">WÜRTH</h3>
+                    <span class="bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider">Fast Aftale</span>
+                  </div>
+                  <p class="text-xs font-bold text-orange-400 mt-1">Fast leverandør af skruer & befæstigelse</p>
+                  <p class="text-[11px] text-slate-300 mt-0.5">
+                    Beslag, montageskruer, lim, fuge, kemi & bor
+                  </p>
+                </div>
+              </div>
+              <div class="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center shadow-lg transition">
+                <i data-lucide="chevron-right" class="w-5 h-5"></i>
+              </div>
+            </div>
+          </button>
+
+        </div>
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- SCREEN 3: BESTILLINGSVINDUE (Quick Order Form) -->
+      <!-- ========================================================================= -->
+      <section id="screen-order" class="hidden flex-col space-y-4">
+        
+        <!-- Header with Back & Details -->
+        <div class="flex items-center justify-between pt-1">
+          <div>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 mb-1">
+              Trin 3 af 3: Udfyld bestilling
+            </span>
+            <h2 class="text-2xl font-black text-white tracking-tight">Hvad skal du bruge?</h2>
+          </div>
+          <button onclick="switchScreen('screen-supplier')" class="p-2 text-slate-400 hover:text-white bg-slate-800 rounded-xl border border-slate-700">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <!-- Order Context Header (Sag + Leverandør badge) -->
+        <div class="grid grid-cols-2 gap-2 bg-slate-800/90 p-3 rounded-2xl border border-slate-700">
+          <div class="flex items-center space-x-2.5 border-r border-slate-700/80 pr-2">
+            <div class="w-8 h-8 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center shrink-0">
+              <i data-lucide="folder" class="w-4 h-4"></i>
+            </div>
+            <div class="overflow-hidden">
+              <div class="text-[10px] text-slate-400 font-semibold uppercase">Sag</div>
+              <div id="order-sag-text" class="text-xs font-bold text-white truncate">Sag 2401</div>
+            </div>
+          </div>
+          <div class="flex items-center space-x-2.5 pl-2">
+            <div id="order-leverandor-icon-box" class="w-8 h-8 rounded-xl bg-red-600 text-white flex items-center justify-center shrink-0 font-bold text-xs">
+              BYG
+            </div>
+            <div class="overflow-hidden">
+              <div class="text-[10px] text-slate-400 font-semibold uppercase">Modtager</div>
+              <div id="order-leverandor-text" class="text-xs font-bold text-white truncate">Bygma</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FORM CONTAINER -->
+        <form id="order-form" onsubmit="handleOrderSubmit(event)" class="space-y-4">
+          
+          <!-- 1. LEVERINGSTYPE: Big segmented switch -->
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">Leveringsmetode</label>
+            <div class="grid grid-cols-2 gap-2 p-1 bg-slate-950 rounded-2xl border border-slate-800">
+              <button type="button" id="btn-type-delivery" onclick="setDeliveryType('plads')"
+                class="flex items-center justify-center space-x-2 py-3 px-3 rounded-xl font-bold text-xs transition bg-orange-600 text-white shadow-md">
+                <i data-lucide="truck" class="w-4 h-4"></i>
+                <span>Leveres på byggeplads</span>
+              </button>
+              <button type="button" id="btn-type-pickup" onclick="setDeliveryType('afhent')"
+                class="flex items-center justify-center space-x-2 py-3 px-3 rounded-xl font-bold text-xs transition bg-transparent text-slate-400 hover:text-white">
+                <i data-lucide="store" class="w-4 h-4"></i>
+                <span>Afhentes i butik</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 2. LEVERINGSADRESSE (Dynamisk ud fra sag eller afhentningssted) -->
+          <div id="delivery-address-group" class="space-y-1.5">
+            <div class="flex items-center justify-between">
+              <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">Leveringsadresse / Aflæsningssted</label>
+              <span class="text-[11px] text-orange-400 font-medium">Hentet fra sag</span>
+            </div>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <i data-lucide="map-pin" class="w-4 h-4"></i>
+              </div>
+              <input type="text" id="order-address" required
+                class="w-full pl-10 pr-4 py-3 bg-slate-800/90 border border-slate-700 focus:border-orange-500 rounded-xl text-white text-sm font-medium focus:outline-none transition"
+                value="Risskov Strandvej 42, 8240 Risskov (Varemodtagelse ved skurvogn)">
+            </div>
+          </div>
+
+          <!-- 3. TIDSPUNKT: Store nemme knapper -->
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">Hvornår skal det være klar?</label>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              <button type="button" onclick="setTimePreset('Hurtigst muligt (Strakshold)')"
+                class="time-btn p-2.5 rounded-xl border border-slate-700 bg-slate-800/90 text-left hover:border-orange-500 transition active:scale-95">
+                <div class="text-[10px] text-red-400 font-bold flex items-center">
+                  <i data-lucide="zap" class="w-3 h-3 mr-1"></i> STRAKS
+                </div>
+                <div class="text-xs font-extrabold text-white mt-0.5">Hurtigst muligt</div>
+              </button>
+              
+              <button type="button" onclick="setTimePreset('I morgen tidlig kl. 07:00')"
+                class="time-btn active border-2 border-orange-500 bg-orange-950/30 p-2.5 rounded-xl text-left transition active:scale-95">
+                <div class="text-[10px] text-orange-400 font-bold flex items-center">
+                  <i data-lucide="sun" class="w-3 h-3 mr-1"></i> STANDARD
+                </div>
+                <div class="text-xs font-extrabold text-white mt-0.5">I morgen kl. 07:00</div>
+              </button>
+
+              <button type="button" onclick="setTimePreset('I dag kl. 12:00')"
+                class="time-btn p-2.5 rounded-xl border border-slate-700 bg-slate-800/90 text-left hover:border-orange-500 transition active:scale-95">
+                <div class="text-[10px] text-slate-400 font-bold flex items-center">
+                  <i data-lucide="clock" class="w-3 h-3 mr-1"></i> MIDDAG
+                </div>
+                <div class="text-xs font-extrabold text-white mt-0.5">I dag kl. 12:00</div>
+              </button>
+            </div>
+
+            <!-- Valgt tidspunkt input felt -->
+            <input type="text" id="order-time-custom" required
+              value="I morgen tidlig kl. 07:00"
+              class="mt-2 w-full px-3.5 py-2.5 bg-slate-800/60 border border-slate-700/80 rounded-xl text-xs text-slate-200 focus:border-orange-500 focus:outline-none">
+          </div>
+
+          <!-- 4. MATERIALETEKSTFELT MED TALEGENKENDELSE & HURTIG-TAGS -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">
+                Materialer & Mængder <span class="text-red-400">*</span>
+              </label>
+              
+              <!-- Voice Dictation Button -->
+              <button type="button" id="voice-record-btn" onclick="toggleVoiceDictation('order')"
+                class="flex items-center space-x-1.5 px-3 py-1 rounded-xl bg-orange-600/20 hover:bg-orange-600/30 border border-orange-500/40 text-orange-400 text-xs font-bold active:scale-95 transition">
+                <div id="mic-pulse-indicator" class="w-2 h-2 rounded-full bg-orange-500"></div>
+                <i data-lucide="mic" class="w-3.5 h-3.5"></i>
+                <span id="voice-btn-label">Tryk og tal</span>
+              </button>
+            </div>
+
+            <!-- Live Speech Status Toast -->
+            <div id="voice-listening-toast" class="hidden p-2.5 bg-orange-950/60 border border-orange-500/50 rounded-xl flex items-center justify-between text-xs text-orange-200">
+              <div class="flex items-center space-x-2">
+                <span class="w-3 h-3 rounded-full bg-red-500 recording-pulse"></span>
+                <span class="font-bold">Lytter... Tal naturligt på dansk!</span>
+              </div>
+              <button type="button" onclick="stopVoiceDictation()" class="text-xs bg-orange-600 px-2 py-0.5 rounded-md font-bold text-white">Færdig</button>
+            </div>
+
+            <!-- The Big Material Textarea -->
+            <div class="relative">
+              <textarea id="order-materials" rows="5" required
+                placeholder="Skriv eller indtal hvad du skal bruge... F.eks.:&#10;• 10 pk Würth 4,5x60 terrasseskruer&#10;• 15 stk 45x95 reglar à 4,2 meter&#10;• 2 ruller dampspærre 0,20mm&#10;• 1 ks montagelim"
+                class="w-full p-3.5 bg-slate-800/95 border-2 border-slate-700 focus:border-orange-500 rounded-2xl text-white placeholder-slate-500 text-sm font-medium focus:outline-none transition leading-relaxed"></textarea>
+            </div>
+
+            <!-- Quick Template Chips (1-click insert) -->
+            <div class="space-y-1">
+              <div class="text-[11px] text-slate-400 font-semibold flex items-center justify-between">
+                <span>Hurtig-tilføj standardvarer:</span>
+                <span class="text-[10px] text-slate-500">Klik for at indsætte</span>
+              </div>
+              <div class="flex flex-wrap gap-1.5 text-xs">
+                <button type="button" onclick="appendMaterialTag('10 pk Würth 4,5x60 skruer')"
+                  class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-slate-300 active:scale-95 transition">
+                  + 10 pk Würth 4,5x60
+                </button>
+                <button type="button" onclick="appendMaterialTag('15 stk 45x95 C24 reglar à 4,2m')"
+                  class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-slate-300 active:scale-95 transition">
+                  + 15 stk 45x95 reglar
+                </button>
+                <button type="button" onclick="appendMaterialTag('8 plader 13mm Fermacell')"
+                  class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-slate-300 active:scale-95 transition">
+                  + 8 plader Fermacell
+                </button>
+                <button type="button" onclick="appendMaterialTag('2 ruller dampspærre 2x50m')"
+                  class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-slate-300 active:scale-95 transition">
+                  + 2 ruller dampspærre
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. FOTO / DOKUMENTATION UPLOAD (Kamera/Galleri) -->
+          <div class="space-y-2">
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">
+              Foto af håndskrevet seddel eller pladsen (valgfrit)
+            </label>
+            
+            <div class="flex items-center space-x-3">
+              <label class="cursor-pointer flex-1 flex items-center justify-center space-x-2 py-3 px-4 bg-slate-800 hover:bg-slate-700/80 border-2 border-dashed border-slate-700 hover:border-orange-500 rounded-xl text-slate-300 transition active:scale-98">
+                <i data-lucide="camera" class="w-5 h-5 text-orange-400"></i>
+                <span class="text-xs font-bold">Tag billede / Tilføj foto</span>
+                <input type="file" id="order-photo-input" accept="image/*" capture="environment" onchange="handlePhotoUpload(event, 'order')" class="hidden">
+              </label>
+
+              <button type="button" onclick="simulatePhotoAttachment('order')"
+                class="px-3 py-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition"
+                title="Tilføj eksempel-billede">
+                Demo-seddel
+              </button>
+            </div>
+
+            <div id="photo-preview-box" class="hidden relative rounded-xl overflow-hidden border border-slate-700 bg-slate-950 p-2 flex items-center space-x-3">
+              <img id="photo-preview-img" src="" alt="Bilag" class="w-16 h-16 object-cover rounded-lg border border-slate-700">
+              <div class="flex-1 overflow-hidden">
+                <div id="photo-filename" class="text-xs font-bold text-white truncate">seddel_plads.jpg</div>
+                <div class="text-[10px] text-emerald-400 mt-0.5">Klar til afsendelse med mail</div>
+              </div>
+              <button type="button" onclick="removePhotoAttachment('order')" class="p-2 text-slate-400 hover:text-red-400">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- 6. BESTILLER & BEMÆRKNING -->
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Bestiller (Navn)</label>
+              <input type="text" id="order-sender" required
+                value="Marcus Dalland Braae"
+                class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:border-orange-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Mobilnr. på pladsen</label>
+              <input type="tel" id="order-phone" required
+                value="+45 22 88 14 00"
+                class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:border-orange-500 focus:outline-none">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Bemærkning til chauffør / lager</label>
+            <input type="text" id="order-note"
+              placeholder="F.eks.: Ring 15 min før ankomst, kranbil påkrævet..."
+              class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:border-orange-500 focus:outline-none">
+          </div>
+
+          <!-- 7. THE BIG GREEN TOUCH-FRIENDLY CTA BUTTON -->
+          <div class="pt-2">
+            <button type="submit" id="submit-order-btn"
+              class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-emerald-600 via-emerald-500 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white font-black text-lg shadow-xl shadow-emerald-950/60 border border-emerald-400/40 flex items-center justify-center space-x-3 active:scale-[0.98] transition cursor-pointer">
+              <i data-lucide="send" class="w-6 h-6"></i>
+              <span class="tracking-wide">SEND BESTILLING NU</span>
+            </button>
+            <p class="text-center text-[11px] text-slate-400 mt-2">
+              ⚡ Sender automatisk mail til leverandør & logger i E-komplet
+            </p>
+          </div>
+
+        </form>
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- SCREEN 3B: RETURVARE-FORMULAR (Mobil-først Returregistrering) -->
+      <!-- ========================================================================= -->
+      <section id="screen-return-form" class="hidden flex-col space-y-4">
+        
+        <!-- Header with Back & Details -->
+        <div class="flex items-center justify-between pt-1">
+          <div>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20 mb-1">
+              Trin 3 af 3: Melde Returvare
+            </span>
+            <h2 class="text-2xl font-black text-white tracking-tight">Hvad sendes retur?</h2>
+          </div>
+          <button onclick="switchScreen('screen-supplier')" class="p-2 text-slate-400 hover:text-white bg-slate-800 rounded-xl border border-slate-700">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <!-- Return Context Header (Sag + Leverandør badge) -->
+        <div class="grid grid-cols-2 gap-2 bg-slate-800/90 p-3 rounded-2xl border border-amber-500/30">
+          <div class="flex items-center space-x-2.5 border-r border-slate-700/80 pr-2">
+            <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+              <i data-lucide="folder" class="w-4 h-4"></i>
+            </div>
+            <div class="overflow-hidden">
+              <div class="text-[10px] text-slate-400 font-semibold uppercase">Sag</div>
+              <div id="return-sag-text" class="text-xs font-bold text-white truncate">Sag 2401</div>
+            </div>
+          </div>
+          <div class="flex items-center space-x-2.5 pl-2">
+            <div id="return-leverandor-icon-box" class="w-8 h-8 rounded-xl bg-red-600 text-white flex items-center justify-center shrink-0 font-bold text-xs">
+              BYG
+            </div>
+            <div class="overflow-hidden">
+              <div class="text-[10px] text-slate-400 font-semibold uppercase">Retur til</div>
+              <div id="return-leverandor-text" class="text-xs font-bold text-white truncate">Bygma</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FORM CONTAINER FOR RETURNS -->
+        <form id="return-form" onsubmit="handleReturnSubmit(event)" class="space-y-4">
+          
+          <!-- 1. RETURMETODE: Big segmented switch -->
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">Afhentning / Returnering</label>
+            <div class="grid grid-cols-2 gap-2 p-1 bg-slate-950 rounded-2xl border border-slate-800">
+              <button type="button" id="btn-return-pickup" onclick="setReturnMethod('afhent')"
+                class="flex items-center justify-center space-x-2 py-3 px-3 rounded-xl font-bold text-xs transition bg-amber-600 text-white shadow-md">
+                <i data-lucide="truck" class="w-4 h-4"></i>
+                <span>Afhentes på byggeplads</span>
+              </button>
+              <button type="button" id="btn-return-dropoff" onclick="setReturnMethod('dropoff')"
+                class="flex items-center justify-center space-x-2 py-3 px-3 rounded-xl font-bold text-xs transition bg-transparent text-slate-400 hover:text-white">
+                <i data-lucide="store" class="w-4 h-4"></i>
+                <span>Afleveret i butik</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Afhentningsadresse / Placering på byggepladsen -->
+          <div id="return-location-group" class="space-y-1.5">
+            <div class="flex items-center justify-between">
+              <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">Hvor står varerne på pladsen?</label>
+              <span class="text-[11px] text-amber-400 font-medium">Til trælast-vognmand</span>
+            </div>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <i data-lucide="map-pin" class="w-4 h-4"></i>
+              </div>
+              <input type="text" id="return-location" required
+                class="w-full pl-10 pr-4 py-3 bg-slate-800/90 border border-slate-700 focus:border-amber-500 rounded-xl text-white text-sm font-medium focus:outline-none transition"
+                value="Risskov Strandvej 42 (Står samlet på europalle ved container 2)">
+            </div>
+          </div>
+
+          <!-- 2. HVAD SENDES RETUR -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">
+                Varer, Mængder & Stand <span class="text-red-400">*</span>
+              </label>
+              
+              <!-- Voice Dictation Button for Return -->
+              <button type="button" id="voice-record-btn-return" onclick="toggleVoiceDictation('return')"
+                class="flex items-center space-x-1.5 px-3 py-1 rounded-xl bg-amber-600/20 hover:bg-amber-600/30 border border-amber-500/40 text-amber-400 text-xs font-bold active:scale-95 transition">
+                <div id="mic-pulse-indicator-return" class="w-2 h-2 rounded-full bg-amber-500"></div>
+                <i data-lucide="mic" class="w-3.5 h-3.5"></i>
+                <span id="voice-btn-label-return">Tryk og tal</span>
+              </button>
+            </div>
+
+            <!-- The Big Return Material Textarea -->
+            <div class="relative">
+              <textarea id="return-materials" rows="5" required
+                placeholder="Angiv præcist hvad der sendes retur... F.eks.:&#10;• 5 uåbnede pakker gipsskruer 3,9x30&#10;• 12 stk 45x195 spærtræ 4.8m ubrugt&#10;• 3 ruller undertag ubeskadiget&#10;• 4 tomme Bygma returpaller"
+                class="w-full p-3.5 bg-slate-800/95 border-2 border-slate-700 focus:border-amber-500 rounded-2xl text-white placeholder-slate-500 text-sm font-medium focus:outline-none transition leading-relaxed"></textarea>
+            </div>
+
+            <!-- Quick Return Template Chips -->
+            <div class="space-y-1">
+              <div class="text-[11px] text-slate-400 font-semibold flex items-center justify-between">
+                <span>Hurtig-tilføj typiske returvarer:</span>
+                <span class="text-[10px] text-slate-500">Klik for at indsætte</span>
+              </div>
+              <div class="flex flex-wrap gap-1.5 text-xs">
+                <button type="button" onclick="appendReturnTag('5 uåbnede pakker gipsskruer')"
+                  class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-slate-300 active:scale-95 transition">
+                  + 5 pk uåbnede gipsskruer
+                </button>
+                <button type="button" onclick="appendReturnTag('12 stk 45x195 spærtræ 4.8m ubrugt')"
+                  class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-slate-300 active:scale-95 transition">
+                  + 12 stk 45x195 spærtræ
+                </button>
+                <button type="button" onclick="appendReturnTag('4 stk tomme returpaller')"
+                  class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-slate-300 active:scale-95 transition">
+                  + 4 stk returpaller
+                </button>
+                <button type="button" onclick="appendReturnTag('6 plader uåbnet gips 120x240')"
+                  class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-slate-300 active:scale-95 transition">
+                  + 6 plader gips
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. ESTIMERET RETURVÆRDI & ÅRSAG -->
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Estimeret værdi (ca. kr)</label>
+              <input type="number" id="return-estimated-val" placeholder="f.eks. 3400"
+                value="3400"
+                class="w-full px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-amber-400 font-bold focus:border-amber-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Årsag til retur</label>
+              <select id="return-reason" class="w-full px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:border-amber-500 focus:outline-none">
+                <button disabled selected>Vælg årsag</button>
+                <option value="Overskydende efter færdiggørelse" selected>Overskydende (færdig sag)</option>
+                <option value="Fejlleveret fra trælast">Fejlleveret af trælast</option>
+                <option value="Ændring i projekt/tegning">Projektændring</option>
+                <option value="Retur-emballage / Paller">Emballage / Paller</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 4. FOTO AF VARERNE ELLER RETURSEDDEL (Vigtigt for kreditnota) -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">
+                Foto af varer / underskrevet returseddel
+              </label>
+              <span class="text-[10px] text-amber-400 font-bold">Bevis for kreditering</span>
+            </div>
+            
+            <div class="flex items-center space-x-3">
+              <label class="cursor-pointer flex-1 flex items-center justify-center space-x-2 py-3 px-4 bg-slate-800 hover:bg-slate-700/80 border-2 border-dashed border-slate-700 hover:border-amber-500 rounded-xl text-slate-300 transition active:scale-98">
+                <i data-lucide="camera" class="w-5 h-5 text-amber-400"></i>
+                <span class="text-xs font-bold">Tag billede af returvarer</span>
+                <input type="file" id="return-photo-input" accept="image/*" capture="environment" onchange="handlePhotoUpload(event, 'return')" class="hidden">
+              </label>
+
+              <button type="button" onclick="simulatePhotoAttachment('return')"
+                class="px-3 py-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition"
+                title="Tilføj eksempel-returfoto">
+                Demo-foto
+              </button>
+            </div>
+
+            <div id="return-photo-preview-box" class="hidden relative rounded-xl overflow-hidden border border-slate-700 bg-slate-950 p-2 flex items-center space-x-3">
+              <img id="return-photo-preview-img" src="" alt="Returbilag" class="w-16 h-16 object-cover rounded-lg border border-slate-700">
+              <div class="flex-1 overflow-hidden">
+                <div id="return-photo-filename" class="text-xs font-bold text-white truncate">retur_palle_foto.jpg</div>
+                <div class="text-[10px] text-emerald-400 mt-0.5">Dokumentation vedhæftet trælast & E-komplet</div>
+              </div>
+              <button type="button" onclick="removePhotoAttachment('return')" class="p-2 text-slate-400 hover:text-red-400">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- 5. HÅNDVÆRKER / SVEND PÅ PLADSEN -->
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Meldt retur af</label>
+              <input type="text" id="return-sender" required
+                value="Mikkel H. (Svend)"
+                class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:border-amber-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Mobilnr. på pladsen</label>
+              <input type="tel" id="return-phone" required
+                value="+45 28 44 91 10"
+                class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:border-amber-500 focus:outline-none">
+            </div>
+          </div>
+
+          <!-- EPIKUR CREDIT WATCH PROMISE BOX -->
+          <div class="p-3 bg-gradient-to-r from-slate-900 to-amber-950/40 border border-amber-500/40 rounded-2xl flex items-start space-x-3">
+            <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 mt-0.5 border border-amber-500/30">
+              <i data-lucide="radar" class="w-4 h-4"></i>
+            </div>
+            <div class="text-xs">
+              <div class="font-black text-white flex items-center space-x-1.5">
+                <span class="text-amber-400">Epikur Credit Watch</span>
+                <span class="px-1.5 py-0.2 bg-amber-500/20 text-amber-300 rounded text-[9px] uppercase font-bold">Autopilot</span>
+              </div>
+              <p class="text-slate-300 text-[11px] mt-0.5 leading-snug">
+                Når du trykker godkend, sender Epikur besked til trælasten og <strong>overvåger automatisk E-komplet</strong>, indtil den modsvarende kreditnota er modtaget og godkendt!
+              </p>
+            </div>
+          </div>
+
+          <!-- 6. THE BIG AMBER TOUCH-FRIENDLY CTA BUTTON -->
+          <div class="pt-2">
+            <button type="submit" id="submit-return-btn"
+              class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-amber-600 via-amber-500 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-black text-lg shadow-xl shadow-amber-950/60 border border-amber-400/40 flex items-center justify-center space-x-3 active:scale-[0.98] transition cursor-pointer">
+              <i data-lucide="rotate-ccw" class="w-6 h-6"></i>
+              <span class="tracking-wide">MELD RETURVARE NU</span>
+            </button>
+            <p class="text-center text-[11px] text-slate-400 mt-2">
+              ⚡ Opretter retur-ID, adviserer trælast & aktiverer Epikur Credit Watch
+            </p>
+          </div>
+
+        </form>
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- SCREEN 4: KVITTERING (Receipt & Confirmation - Order / Return) -->
+      <!-- ========================================================================= -->
+      <section id="screen-receipt" class="hidden flex-col space-y-4">
+        
+        <!-- Big Success Hero -->
+        <div class="text-center py-4 px-2">
+          <div id="receipt-hero-icon-box" class="w-20 h-20 bg-emerald-500/20 text-emerald-400 rounded-3xl border-2 border-emerald-500/40 flex items-center justify-center mx-auto mb-3 shadow-xl shadow-emerald-950/50">
+            <i id="receipt-hero-icon" data-lucide="check-circle-2" class="w-12 h-12 text-emerald-400"></i>
+          </div>
+          <div id="receipt-type-pill" class="inline-block px-3 py-1 bg-emerald-500/20 text-emerald-300 font-bold text-xs rounded-full border border-emerald-500/30 mb-2">
+            BESTILLING GENNEMFØRT
+          </div>
+          <h2 id="receipt-header-title" class="text-2xl font-black text-white">Ordrereference</h2>
+          <div id="receipt-order-id" class="text-2xl font-mono font-black text-orange-400 mt-1 tracking-wider select-all">
+            NTV-2026-8492
+          </div>
+        </div>
+
+        <!-- Automatic Actions Verification List -->
+        <div class="bg-slate-800/90 rounded-2xl border border-slate-700 p-4 space-y-3">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Automatisk udført i baggrunden:</h3>
+          
+          <div class="flex items-start space-x-3 text-xs">
+            <div class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+              <i data-lucide="check" class="w-3.5 h-3.5"></i>
+            </div>
+            <div>
+              <span id="receipt-action-1-title" class="font-bold text-white">Mail afsendt til leverandør:</span>
+              <p id="receipt-supplier-mail-info" class="text-slate-400">Sendt til ordre@leverandor.dk m. aftalepriser og referencenr.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start space-x-3 text-xs">
+            <div class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+              <i data-lucide="check" class="w-3.5 h-3.5"></i>
+            </div>
+            <div>
+              <span id="receipt-action-2-title" class="font-bold text-white">E-komplet integration:</span>
+              <p id="receipt-action-2-desc" class="text-slate-400">Oprettet som afventende indkøbsordre på sagsmappen.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start space-x-3 text-xs">
+            <div class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+              <i data-lucide="check" class="w-3.5 h-3.5"></i>
+            </div>
+            <div>
+              <span id="receipt-action-3-title" class="font-bold text-white">Epikur AI Overvågning:</span>
+              <p id="receipt-action-3-desc" class="text-slate-400">Klar til automatisk kontrol så snart leverandørfakturaen rammer indbakken.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary Card -->
+        <div class="bg-slate-800/60 rounded-2xl border border-slate-700/80 p-4 space-y-2.5 text-xs">
+          <div class="flex justify-between items-center pb-2 border-b border-slate-700/60">
+            <span class="text-slate-400">Sag:</span>
+            <span id="receipt-sag" class="font-bold text-white">Sag 2401 - Risskov</span>
+          </div>
+          <div class="flex justify-between items-center pb-2 border-b border-slate-700/60">
+            <span class="text-slate-400">Leverandør:</span>
+            <span id="receipt-supplier" class="font-bold text-orange-400">Bygma</span>
+          </div>
+          <div class="flex justify-between items-center pb-2 border-b border-slate-700/60">
+            <span id="receipt-detail-type-label" class="text-slate-400">Levering:</span>
+            <span id="receipt-delivery-time" class="font-bold text-white">I morgen kl. 07:00</span>
+          </div>
+          <div>
+            <span id="receipt-materials-title" class="text-slate-400 block mb-1">Specifikation:</span>
+            <div id="receipt-materials-list" class="bg-slate-900 p-2.5 rounded-xl font-mono text-slate-200 text-xs whitespace-pre-line border border-slate-800">
+              10 pk. Würth 4,5x60 terrasseskruer
+            </div>
+          </div>
+        </div>
+
+        <!-- Action CTAs -->
+        <div class="space-y-2 pt-2">
+          <!-- 3-Way Match Demonstration Button -->
+          <button id="receipt-simulation-cta" onclick="openSimulationForCurrentOrder()"
+            class="w-full py-3.5 px-4 rounded-xl bg-orange-600 hover:bg-orange-500 text-white font-black text-sm flex items-center justify-center space-x-2 shadow-lg shadow-orange-950/50 active:scale-95 transition">
+            <i data-lucide="shield-alert" class="w-4 h-4"></i>
+            <span>Simuler Epikur 3-Vejs Match & Fakturakontrol</span>
+          </button>
+
+          <!-- Go to Admin Panel button -->
+          <button onclick="switchToAdminFromReceipt()"
+            class="w-full py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-xs flex items-center justify-center space-x-2 border border-slate-700 active:scale-95 transition">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+            <span>Åbn Projektleder & Admin Panel</span>
+          </button>
+
+          <!-- New Order/Return Button -->
+          <button onclick="startNewFlow()"
+            class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 font-semibold text-xs flex items-center justify-center space-x-2 border border-slate-800 active:scale-95 transition">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            <span>Opret ny sagshandling</span>
+          </button>
+        </div>
+
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- SCREEN 5: ORDRE- & RETURHISTORIK (Saved in LocalStorage) -->
+      <!-- ========================================================================= -->
+      <section id="screen-history" class="hidden flex-col space-y-4">
+        <div class="flex items-center justify-between pt-1">
+          <div>
+            <h2 class="text-2xl font-black text-white tracking-tight">Pladshistorik</h2>
+            <p class="text-sm text-slate-400 mt-0.5">Bestillinger & retursager gemt på denne enhed</p>
+          </div>
+          <button onclick="switchScreen('screen-case')" class="p-2 text-slate-400 hover:text-white bg-slate-800 rounded-xl border border-slate-700">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <!-- Filter tabs for history -->
+        <div class="flex space-x-2 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-bold">
+          <button id="hist-tab-all" onclick="filterHistoryDisplay('all')" class="flex-1 py-1.5 rounded-lg bg-orange-600 text-white transition">Alle</button>
+          <button id="hist-tab-orders" onclick="filterHistoryDisplay('orders')" class="flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white transition">Bestillinger</button>
+          <button id="hist-tab-returns" onclick="filterHistoryDisplay('returns')" class="flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white transition">Returvarer</button>
+        </div>
+
+        <div id="history-orders-list" class="space-y-3">
+          <!-- Populated dynamically -->
+        </div>
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- SCREEN 6: ADMIN & PROJEKTLEDER PANEL (Marcus Dashboard) -->
+      <!-- ========================================================================= -->
+      <section id="screen-admin" class="hidden flex-col space-y-5">
+        
+        <!-- Dashboard Top Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1 border-b border-slate-800 pb-4">
+          <div>
+            <div class="flex items-center space-x-2 mb-1">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-black bg-orange-500/20 text-orange-400 border border-orange-500/30">
+                PROJEKTLEDER & KONTORVISNING
+              </span>
+              <span class="text-xs text-slate-400 font-medium">Marcus Dalland Braae</span>
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Indkøbs- & Fakturakontrol</h2>
+            <p class="text-xs sm:text-sm text-slate-400 mt-0.5">Live overblik over fejlfaktureringer, kreditnotaer og Epikur automatisering.</p>
+          </div>
+
+          <div class="flex items-center space-x-2">
+            <button onclick="refreshAdminData()" class="flex items-center space-x-1.5 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold border border-slate-700 active:scale-95 transition">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-orange-400"></i>
+              <span>Synkronisér E-komplet</span>
+            </button>
+            <button onclick="setAppMode('order')" class="flex items-center space-x-1.5 px-3 py-2 bg-orange-600 hover:bg-orange-500 text-white rounded-xl text-xs font-bold shadow-md active:scale-95 transition">
+              <i data-lucide="smartphone" class="w-3.5 h-3.5"></i>
+              <span>Tilbage til Plads</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 1. KPI BÅND (Månedens besparelser & overvågning) -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+          
+          <!-- KPI 1 -->
+          <div class="bg-gradient-to-br from-slate-800/90 to-slate-850 p-3.5 rounded-2xl border border-slate-700/80 shadow-lg relative overflow-hidden">
+            <div class="flex items-center justify-between text-slate-400 mb-1">
+              <span class="text-[11px] font-bold uppercase tracking-wider">Fejlfakturaer fanget</span>
+              <i data-lucide="shield-alert" class="w-4 h-4 text-emerald-400"></i>
+            </div>
+            <div class="text-xl sm:text-2xl font-black text-white" id="kpi-saved-amount">18.450 kr.</div>
+            <p class="text-[10px] text-emerald-400 mt-1 font-semibold flex items-center">
+              <i data-lucide="arrow-up-right" class="w-3 h-3 mr-0.5"></i> Direkte sparet denne måned
+            </p>
+          </div>
+
+          <!-- KPI 2 -->
+          <div class="bg-gradient-to-br from-slate-800/90 to-slate-850 p-3.5 rounded-2xl border border-amber-500/30 shadow-lg relative overflow-hidden">
+            <div class="flex items-center justify-between text-slate-400 mb-1">
+              <span class="text-[11px] font-bold uppercase tracking-wider">Mangler Kreditnota</span>
+              <i data-lucide="hourglass" class="w-4 h-4 text-amber-400"></i>
+            </div>
+            <div class="text-xl sm:text-2xl font-black text-amber-400" id="kpi-pending-returns-count">3 sager</div>
+            <p class="text-[10px] text-slate-300 mt-1 font-semibold">
+              Værdi: <span class="font-bold text-white" id="kpi-pending-returns-val">12.150 kr.</span>
+            </p>
+          </div>
+
+          <!-- KPI 3 -->
+          <div class="bg-gradient-to-br from-slate-800/90 to-slate-850 p-3.5 rounded-2xl border border-slate-700/80 shadow-lg relative overflow-hidden">
+            <div class="flex items-center justify-between text-slate-400 mb-1">
+              <span class="text-[11px] font-bold uppercase tracking-wider">3-Vejs Match Rate</span>
+              <i data-lucide="check-check" class="w-4 h-4 text-blue-400"></i>
+            </div>
+            <div class="text-xl sm:text-2xl font-black text-white">94,2%</div>
+            <p class="text-[10px] text-blue-400 mt-1 font-semibold">
+              49 ud af 52 godkendt automatisk
+            </p>
+          </div>
+
+          <!-- KPI 4 -->
+          <div class="bg-gradient-to-br from-slate-800/90 to-slate-850 p-3.5 rounded-2xl border border-slate-700/80 shadow-lg relative overflow-hidden">
+            <div class="flex items-center justify-between text-slate-400 mb-1">
+              <span class="text-[11px] font-bold uppercase tracking-wider">Epikur Credit Watch</span>
+              <i data-lucide="radar" class="w-4 h-4 text-purple-400"></i>
+            </div>
+            <div class="text-xl sm:text-2xl font-black text-purple-400">Aktiv 24/7</div>
+            <p class="text-[10px] text-slate-300 mt-1 font-semibold">
+              Overvåger E-komplet API
+            </p>
+          </div>
+
+        </div>
+
+        <!-- 2. OVERSIGT OVER FEJLFAKTURAER (Discrepancy Log) -->
+        <div class="bg-slate-850/80 rounded-3xl border border-slate-700/90 overflow-hidden shadow-xl">
+          <div class="p-4 border-b border-slate-800 bg-slate-800/60 flex items-center justify-between">
+            <div class="flex items-center space-x-2.5">
+              <div class="w-8 h-8 rounded-xl bg-red-600/20 text-red-400 flex items-center justify-center border border-red-500/30">
+                <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h3 class="text-base font-black text-white leading-tight">Fejlfakturaer fanget af Epikur (Discrepancy Log)</h3>
+                <p class="text-xs text-slate-400">Fakturaer fra E-komplet der afviger fra håndværkerens app-bestilling</p>
+              </div>
+            </div>
+            <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-red-500/20 text-red-300 border border-red-500/40" id="discrepancy-counter-tag">
+              2 afventer handling
+            </span>
+          </div>
+
+          <!-- Discrepancy Items Container -->
+          <div id="discrepancy-list" class="divide-y divide-slate-800 p-2 sm:p-4 space-y-3">
+            <!-- Dynamic discrepancies rendered here -->
+          </div>
+        </div>
+
+        <!-- 3. MANGLER KREDITNOTA (Pending Returns / Credit Notes) -->
+        <div class="bg-slate-850/80 rounded-3xl border border-slate-700/90 overflow-hidden shadow-xl">
+          <div class="p-4 border-b border-slate-800 bg-slate-800/60 flex items-center justify-between">
+            <div class="flex items-center space-x-2.5">
+              <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
+                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h3 class="text-base font-black text-white leading-tight">Mangler Kreditnota (Pending Returns)</h3>
+                <p class="text-xs text-slate-400">Varer sendt retur fra pladsen hvor modsvarende kreditnota udestår i E-komplet</p>
+              </div>
+            </div>
+            <button onclick="setAppMode('return')" class="text-xs font-bold text-amber-400 hover:text-amber-300 flex items-center space-x-1">
+              <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+              <span>Opret ny retur</span>
+            </button>
+          </div>
+
+          <!-- Pending Returns Items Container -->
+          <div id="pending-returns-list" class="divide-y divide-slate-800 p-2 sm:p-4 space-y-3">
+            <!-- Dynamic pending returns rendered here -->
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- ========================================================================= -->
+    <!-- DRAWER / MODAL: EPIKUR 3-VEJS MATCH SIMULATION -->
+    <!-- ========================================================================= -->
+    <div id="three-way-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div class="w-full max-w-lg bg-slate-900 border border-slate-700 sm:rounded-3xl rounded-t-3xl shadow-2xl max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom duration-200">
+        
+        <!-- Modal Header -->
+        <div class="p-4 border-b border-slate-800 bg-slate-850 flex items-center justify-between">
+          <div class="flex items-center space-x-2.5">
+            <div class="w-9 h-9 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center border border-orange-500/30">
+              <i data-lucide="cpu" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-black text-white leading-tight">Epikur AI 3-Vejs Match</h3>
+              <p class="text-[11px] text-slate-400">Automatisk kontrol: Rekvisition vs. Følgeseddel vs. Faktura</p>
+            </div>
+          </div>
+          <button onclick="toggleThreeWayModal(false)" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <!-- Simulation Toggle: Perfect match vs. Discrepancy (Fejl) -->
+        <div class="p-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
+          <span class="text-xs font-bold text-slate-300">Simuler scenarie:</span>
+          <div class="flex items-center space-x-1.5 p-1 bg-slate-800 rounded-xl border border-slate-700 text-xs">
+            <button id="sim-scenario-error-btn" onclick="setSimulationScenario('error')"
+              class="px-2.5 py-1 rounded-lg font-bold bg-red-600 text-white shadow">
+              🚨 Fakturafejl fundet
+            </button>
+            <button id="sim-scenario-ok-btn" onclick="setSimulationScenario('ok')"
+              class="px-2.5 py-1 rounded-lg font-semibold text-slate-400 hover:text-white">
+              ✅ 100% Match
+            </button>
+          </div>
+        </div>
+
+        <!-- Modal Body (3 Pillars Comparison) -->
+        <div class="p-4 overflow-y-auto space-y-4 text-xs">
+          
+          <!-- Pillar 1: App Bestilling (Indkøbsrekvisition) -->
+          <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700 space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-orange-400 flex items-center space-x-1.5">
+                <i data-lucide="smartphone" class="w-3.5 h-3.5"></i>
+                <span>1. Mobil App Bestilling (Nortvig Rekvisition)</span>
+              </span>
+              <span id="sim-order-ref" class="font-mono text-[11px] text-slate-400">NTV-2026-8492</span>
+            </div>
+            <div class="bg-slate-900 p-2.5 rounded-lg font-mono text-slate-300 text-[11px] leading-relaxed">
+              <div>Sag: <span id="sim-sag-label" class="text-white font-semibold">Sag 2401 - Risskov Strandvej</span></div>
+              <div>Leverandør: <span id="sim-sup-label" class="text-white font-semibold">Bygma</span></div>
+              <div>Bestilt: <span id="sim-ordered-items" class="text-emerald-400">10 pk. 4,5x60 Terrasseskruer (Aftalepris kr. 145,-/pk)</span></div>
+              <div class="text-slate-400">Forventet total: <span class="text-white font-bold">1.450,00 DKK</span></div>
+            </div>
+          </div>
+
+          <!-- Pillar 2: Byggeplads Modtagelse (Følgeseddel) -->
+          <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700 space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-blue-400 flex items-center space-x-1.5">
+                <i data-lucide="truck" class="w-3.5 h-3.5"></i>
+                <span>2. Følgeseddel ved aflæsning</span>
+              </span>
+              <span class="text-[10px] text-emerald-400 font-bold">Modtaget på pladsen</span>
+            </div>
+            <div class="bg-slate-900 p-2.5 rounded-lg font-mono text-slate-300 text-[11px] leading-relaxed">
+              <div>Følgeseddel nr: <span class="text-white">FS-991204</span> (Chauffør kvitteret)</div>
+              <div>Leveret på byggeplads: <span class="text-blue-300">10 pk. 4,5x60 Terrasseskruer</span></div>
+            </div>
+          </div>
+
+          <!-- Pillar 3: Leverandørfaktura i E-komplet -->
+          <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700 space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-purple-400 flex items-center space-x-1.5">
+                <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                <span>3. Modtaget Faktura (E-komplet indbakke)</span>
+              </span>
+              <span class="font-mono text-[11px] text-slate-400">Fak. 488219</span>
+            </div>
+            <div id="sim-invoice-box" class="bg-slate-900 p-2.5 rounded-lg font-mono text-[11px] leading-relaxed border">
+              <!-- Dynamically populated based on scenario -->
+            </div>
+          </div>
+
+          <!-- Epikur AI Audit Result Banner -->
+          <div id="sim-audit-result" class="p-3.5 rounded-xl border space-y-2">
+            <!-- Dynamically populated -->
+          </div>
+
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="p-3 border-t border-slate-800 bg-slate-850 flex items-center justify-end space-x-2">
+          <button onclick="toggleThreeWayModal(false)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition">
+            Luk
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Floating Navigation Bar (Mobile Tab Bar) -->
+    <nav class="bg-slate-900/95 backdrop-blur-md border-t border-slate-800 px-4 sm:px-6 py-2.5 flex items-center justify-around fixed sm:absolute bottom-0 inset-x-0 z-30">
+      
+      <!-- Order / Plads Tab -->
+      <button onclick="setAppMode('order')" id="nav-btn-order" class="flex flex-col items-center space-y-1 text-orange-500 font-bold text-[11px] transition active:scale-95">
+        <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+        <span>Bestil</span>
+      </button>
+
+      <!-- Return Tab -->
+      <button onclick="setAppMode('return')" id="nav-btn-return" class="flex flex-col items-center space-y-1 text-slate-400 hover:text-amber-400 font-semibold text-[11px] transition active:scale-95">
+        <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+        <span>Retur</span>
+      </button>
+
+      <!-- Admin Panel Tab -->
+      <button onclick="toggleAdminView()" id="nav-btn-admin" class="flex flex-col items-center space-y-1 text-slate-400 hover:text-slate-200 font-semibold text-[11px] transition active:scale-95 relative">
+        <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+        <span>Admin</span>
+        <span class="absolute -top-1 right-2 w-2 h-2 rounded-full bg-red-500"></span>
+      </button>
+
+      <!-- 3-Way Match Shortcut -->
+      <button onclick="toggleThreeWayModal(true)" id="nav-btn-match" class="flex flex-col items-center space-y-1 text-slate-400 hover:text-slate-200 font-semibold text-[11px] transition active:scale-95">
+        <i data-lucide="shield-check" class="w-5 h-5"></i>
+        <span>3-Vejs Match</span>
+      </button>
+
+      <!-- History Tab -->
+      <button onclick="switchScreen('screen-history')" id="nav-btn-history" class="flex flex-col items-center space-y-1 text-slate-400 hover:text-slate-200 font-semibold text-[11px] transition active:scale-95">
+        <i data-lucide="clipboard-list" class="w-5 h-5"></i>
+        <span>Historik</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <!-- JavaScript Logic -->
+  <script>
+    // ==========================================
+    // INITIAL STATE & MOCK DATABASE
+    // ==========================================
+    const DEFAULT_CASES = [
+      { id: '2401', number: 'Sag 2401', name: 'Risskov Strandvej', type: 'Bolig', address: 'Risskov Strandvej 42, 8240 Risskov', manager: 'Marcus Dalland Braae', popular: true },
+      { id: '2380', number: 'Sag 2380', name: 'Brandstationen Aarhus C', type: 'Erhverv', address: 'Ny Munkegade 15, 8000 Aarhus C', manager: 'Mikkel H.', popular: true },
+      { id: '2415', number: 'Sag 2415', name: 'Viborgvej Erhvervsdomicil', type: 'Erhverv', address: 'Viborgvej 112, 8210 Aarhus V', manager: 'Marcus Dalland Braae', popular: true },
+      { id: '2392', number: 'Sag 2392', name: 'Silkeborg Søvilla', type: 'Bolig', address: 'Sejsvej 18, 8600 Silkeborg', manager: 'Jens K.', popular: false },
+      { id: '2420', number: 'Sag 2420', name: 'Skanderborg Bakker', type: 'Bolig', address: 'Bakke Allé 9, 8660 Skanderborg', manager: 'Marcus Dalland Braae', popular: false },
+      { id: '2365', number: 'Sag 2365', name: 'Havneholmen Aarhus Ø', type: 'Erhverv', address: 'Bernhardt Jensens Blvd 8, 8000 Aarhus C', manager: 'Henrik P.', popular: false }
+    ];
+
+    // Pre-loaded Discrepancy Log for Admin Panel
+    let adminDiscrepancies = [
+      {
+        id: 'DISC-8821',
+        case: 'Sag 2401 - Risskov Strandvej',
+        supplier: 'Bygma',
+        invoiceNo: 'FAK-488219',
+        type: 'Mængde & Rabatafvigelse',
+        ordered: '10 pk. 4,5x60 Terrasseskruer',
+        invoiced: '25 pk. 4,5x60 Terrasseskruer',
+        priceDiff: '+1.850,00 DKK',
+        issueDesc: 'Faktureret 25 stk, men app-bestilling og modtaget følgeseddel var kun 10 stk. Samtidig mangler 35% aftalerabat.',
+        status: 'Afventer indsigelse',
+        date: 'I dag kl. 08:30'
+      },
+      {
+        id: 'DISC-8819',
+        case: 'Sag 2380 - Brandstationen',
+        supplier: 'STARK',
+        invoiceNo: 'FAK-990142',
+        type: 'Manglende rabataftale',
+        ordered: '40 stk 45x95 C24 reglar à 4.2m',
+        invoiced: '40 stk 45x95 reglar til standardlistepris',
+        priceDiff: '+890,00 DKK',
+        issueDesc: 'Nortvigs faste 28% tømreraftale på konstruktionstræ er ikke modregnet på fakturaen.',
+        status: 'Afventer indsigelse',
+        date: 'I går kl. 15:10'
+      }
+    ];
+
+    // Pre-loaded Pending Returns for Admin Panel
+    let adminPendingReturns = [
+      {
+        id: 'RET-2026-1042',
+        case: 'Sag 2401 - Risskov Strandvej',
+        supplier: 'Bygma',
+        materials: '12 stk 45x195 spærtræ 4.8m ubrugt + 4 pk skruer',
+        estimatedVal: '3.400,00 DKK',
+        daysOld: 7,
+        status: 'Afventer kreditnota fra Bygma (7 dage gammel)',
+        pickupMethod: 'Afhentet på byggeplads',
+        reminded: false,
+        createdDate: '11. sep 2026'
+      },
+      {
+        id: 'RET-2026-0988',
+        case: 'Sag 2415 - Viborgvej Erhverv',
+        supplier: 'STARK',
+        materials: '8 plader Fermacell 13mm + uåbnet montagelim',
+        estimatedVal: '1.850,00 DKK',
+        daysOld: 4,
+        status: 'Afventer kreditnota fra STARK (4 dage gammel)',
+        pickupMethod: 'Afleveret i butik',
+        reminded: true,
+        createdDate: '14. sep 2026'
+      },
+      {
+        id: 'RET-2026-0955',
+        case: 'Sag 2380 - Brandstationen',
+        supplier: 'XL-BYG',
+        materials: '10 stk tomme returpaller + uåbnede tagrendebeslag',
+        estimatedVal: '1.200,00 DKK',
+        daysOld: 11,
+        status: 'Kritisk: 11 dage uden kreditnota',
+        pickupMethod: 'Afhentet på byggeplads',
+        reminded: true,
+        createdDate: '7. sep 2026'
+      }
+    ];
+
+    // Global application modes: 'order' or 'return'
+    let appMode = 'order'; 
+    let currentFlow = {
+      type: 'order', // 'order' or 'return'
+      id: '',
+      case: DEFAULT_CASES[0],
+      supplier: { name: 'Bygma', email: 'bygma@nortvig-ordrer.dk', desc: 'Trælast & Gips' },
+      deliveryType: 'plads', // 'plads' or 'afhent' (order) | 'afhent' or 'dropoff' (return)
+      address: DEFAULT_CASES[0].address,
+      time: 'I morgen tidlig kl. 07:00',
+      materials: '',
+      estimatedVal: 3400,
+      reason: 'Overskydende efter færdiggørelse',
+      photo: null,
+      sender: 'Marcus Dalland Braae',
+      phone: '+45 22 88 14 00',
+      note: '',
+      timestamp: null
+    };
+
+    let activeFilter = 'alle';
+    let simulationScenario = 'error';
+    let isRecordingSpeech = false;
+    let speechRecognitionInstance = null;
+    let historyFilter = 'all';
+
+    // ==========================================
+    // INITIALIZATION
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', () => {
+      renderCasesList(DEFAULT_CASES);
+      renderAdminDashboard();
+      updateHistoryBadge();
+      initSpeechRecognition();
+      lucide.createIcons();
+    });
+
+    // ==========================================
+    // MODE SWITCHING: NY BESTILLING VS RETURVARE
+    // ==========================================
+    function setAppMode(mode) {
+      appMode = mode;
+      currentFlow.type = mode;
+
+      const btnOrder = document.getElementById('mode-btn-order');
+      const btnReturn = document.getElementById('mode-btn-return');
+      const headerTitle = document.getElementById('header-main-title');
+      const headerBadge = document.getElementById('header-mode-badge');
+      const navOrder = document.getElementById('nav-btn-order');
+      const navReturn = document.getElementById('nav-btn-return');
+      const navAdmin = document.getElementById('nav-btn-admin');
+      const bannerAction = document.getElementById('banner-action-type');
+      const shell = document.getElementById('app-shell');
+
+      // Reset desktop width from admin back to compact mobile container
+      shell.className = "w-full max-w-md md:max-w-xl transition-all duration-300 min-h-screen sm:min-h-[920px] bg-slate-900 sm:rounded-3xl border sm:border-slate-800 shadow-2xl flex flex-col overflow-hidden relative";
+
+      // Show mode bar and progress dots
+      document.getElementById('mode-tab-bar').classList.remove('hidden');
+      document.getElementById('progress-bar-wrapper').classList.remove('hidden');
+
+      if (mode === 'order') {
+        btnOrder.className = 'flex items-center justify-center space-x-2 py-2.5 px-3 rounded-xl font-bold text-xs transition bg-orange-600 text-white shadow-md';
+        btnReturn.className = 'flex items-center justify-center space-x-2 py-2.5 px-3 rounded-xl font-bold text-xs transition text-slate-400 hover:text-white';
+        
+        headerTitle.textContent = 'Materialer & Plads';
+        headerBadge.textContent = 'Lyn-Bestilling';
+        bannerAction.textContent = 'BESTILLING';
+        bannerAction.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-orange-500/20 text-orange-300';
+
+        document.getElementById('flow-indicator-label').textContent = 'Ny Bestilling';
+        document.getElementById('case-screen-title').textContent = 'Hvilken sag bestiller du til?';
+        document.getElementById('case-screen-subtitle').textContent = 'Vælg fra dine aktive byggepladser eller søg sagsnr.';
+
+        navOrder.classList.replace('text-slate-400', 'text-orange-500');
+        navReturn.classList.replace('text-amber-500', 'text-slate-400');
+        navAdmin.classList.replace('text-orange-400', 'text-slate-400');
+
+      } else {
+        // Return mode
+        btnReturn.className = 'flex items-center justify-center space-x-2 py-2.5 px-3 rounded-xl font-bold text-xs transition bg-amber-600 text-white shadow-md';
+        btnOrder.className = 'flex items-center justify-center space-x-2 py-2.5 px-3 rounded-xl font-bold text-xs transition text-slate-400 hover:text-white';
+        
+        headerTitle.textContent = 'Returvare & Kreditering';
+        headerBadge.textContent = 'Send Retur fra Pladsen';
+        bannerAction.textContent = 'RETURVARE';
+        bannerAction.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300';
+
+        document.getElementById('flow-indicator-label').textContent = 'Returvare';
+        document.getElementById('case-screen-title').textContent = 'Hvilken sag returneres fra?';
+        document.getElementById('case-screen-subtitle').textContent = 'Vælg pladsen hvor de ubrugte materialer befinder sig';
+
+        navReturn.classList.replace('text-slate-400', 'text-amber-500');
+        navOrder.classList.replace('text-orange-500', 'text-slate-400');
+        navAdmin.classList.replace('text-orange-400', 'text-slate-400');
+      }
+
+      switchScreen('screen-case');
+      lucide.createIcons();
+    }
+
+    // ==========================================
+    // SCREEN NAVIGATION & FLOW CONTROL
+    // ==========================================
+    function switchScreen(screenId) {
+      const screens = ['screen-case', 'screen-supplier', 'screen-order', 'screen-return-form', 'screen-receipt', 'screen-history', 'screen-admin'];
+      screens.forEach(s => {
+        const el = document.getElementById(s);
+        if (el) el.classList.add('hidden');
+      });
+
+      const target = document.getElementById(screenId);
+      if (target) target.classList.remove('hidden');
+
+      // Update progress dots
+      updateProgressDots(screenId);
+
+      // Top banner visibility
+      const banner = document.getElementById('active-summary-banner');
+      if (screenId === 'screen-supplier' || screenId === 'screen-order' || screenId === 'screen-return-form') {
+        banner.classList.remove('hidden');
+        document.getElementById('banner-case-name').textContent = currentFlow.case.number + ' - ' + currentFlow.case.name;
+        document.getElementById('banner-supplier-name').textContent = currentFlow.supplier ? currentFlow.supplier.name : 'Vælg leverandør';
+      } else {
+        banner.classList.add('hidden');
+      }
+
+      // Update footer nav active state
+      updateNavIcons(screenId);
+
+      // Scroll to top
+      document.querySelector('main').scrollTop = 0;
+      lucide.createIcons();
+    }
+
+    function toggleAdminView() {
+      const shell = document.getElementById('app-shell');
+      const adminScreen = document.getElementById('screen-admin');
+      const isCurrentlyAdmin = !adminScreen.classList.contains('hidden');
+
+      if (isCurrentlyAdmin) {
+        // Return to order view
+        setAppMode(appMode || 'order');
+      } else {
+        // Expand shell on desktop for wide dashboard view
+        shell.className = "w-full max-w-5xl transition-all duration-300 min-h-screen sm:min-h-[920px] bg-slate-900 sm:rounded-3xl border sm:border-slate-800 shadow-2xl flex flex-col overflow-hidden relative";
+        
+        // Hide plads wizard controls
+        document.getElementById('mode-tab-bar').classList.add('hidden');
+        document.getElementById('progress-bar-wrapper').classList.add('hidden');
+        document.getElementById('active-summary-banner').classList.add('hidden');
+
+        document.getElementById('header-main-title').textContent = 'Marcus Dashboard';
+        document.getElementById('header-mode-badge').textContent = 'Admin & Kontrol';
+
+        renderAdminDashboard();
+        switchScreen('screen-admin');
+      }
+      lucide.createIcons();
+    }
+
+    function updateProgressDots(screenId) {
+      const dot1 = document.getElementById('step-dot-1');
+      const dot2 = document.getElementById('step-dot-2');
+      const dot3 = document.getElementById('step-dot-3');
+      const dot4 = document.getElementById('step-dot-4');
+
+      const resetDots = () => {
+        [dot1, dot2, dot3, dot4].forEach(d => {
+          d.className = 'flex-1 h-1.5 rounded-full bg-slate-700 transition-all duration-300';
+        });
+      };
+
+      resetDots();
+      const activeColor = (appMode === 'return') ? 'bg-amber-500' : 'bg-orange-500';
+
+      if (screenId === 'screen-case') {
+        dot1.className = `flex-1 h-1.5 rounded-full ${activeColor} transition-all duration-300`;
+      } else if (screenId === 'screen-supplier') {
+        dot1.className = 'flex-1 h-1.5 rounded-full bg-emerald-500 transition-all duration-300';
+        dot2.className = `flex-1 h-1.5 rounded-full ${activeColor} transition-all duration-300`;
+      } else if (screenId === 'screen-order' || screenId === 'screen-return-form') {
+        dot1.className = 'flex-1 h-1.5 rounded-full bg-emerald-500 transition-all duration-300';
+        dot2.className = 'flex-1 h-1.5 rounded-full bg-emerald-500 transition-all duration-300';
+        dot3.className = `flex-1 h-1.5 rounded-full ${activeColor} transition-all duration-300`;
+      } else if (screenId === 'screen-receipt') {
+        dot1.className = 'flex-1 h-1.5 rounded-full bg-emerald-500 transition-all duration-300';
+        dot2.className = 'flex-1 h-1.5 rounded-full bg-emerald-500 transition-all duration-300';
+        dot3.className = 'flex-1 h-1.5 rounded-full bg-emerald-500 transition-all duration-300';
+        dot4.className = 'flex-1 h-1.5 rounded-full bg-emerald-500 transition-all duration-300';
+      }
+    }
+
+    function updateNavIcons(screenId) {
+      const navOrder = document.getElementById('nav-btn-order');
+      const navReturn = document.getElementById('nav-btn-return');
+      const navAdmin = document.getElementById('nav-btn-admin');
+      const navHistory = document.getElementById('nav-btn-history');
+
+      // Reset
+      [navOrder, navReturn, navAdmin, navHistory].forEach(btn => {
+        btn.className = 'flex flex-col items-center space-y-1 text-slate-400 hover:text-slate-200 font-semibold text-[11px] transition active:scale-95';
+      });
+
+      if (screenId === 'screen-admin') {
+        navAdmin.className = 'flex flex-col items-center space-y-1 text-orange-400 font-bold text-[11px] transition active:scale-95 relative';
+      } else if (screenId === 'screen-history') {
+        navHistory.className = 'flex flex-col items-center space-y-1 text-orange-500 font-bold text-[11px] transition active:scale-95';
+      } else if (appMode === 'return') {
+        navReturn.className = 'flex flex-col items-center space-y-1 text-amber-500 font-bold text-[11px] transition active:scale-95';
+      } else {
+        navOrder.className = 'flex flex-col items-center space-y-1 text-orange-500 font-bold text-[11px] transition active:scale-95';
+      }
+    }
+
+    function resetFlowTo(step) {
+      if (step === 1) switchScreen('screen-case');
+      if (step === 2) switchScreen('screen-supplier');
+    }
+
+    // ==========================================
+    // STEP 1: CASE SELECTION LOGIC
+    // ==========================================
+    function renderCasesList(cases) {
+      const container = document.getElementById('cases-list');
+      container.innerHTML = '';
+
+      if (cases.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8 text-slate-400">
+            <i data-lucide="folder-x" class="w-8 h-8 mx-auto mb-2 text-slate-600"></i>
+            <p class="text-sm font-semibold">Ingen sager matcher søgningen</p>
+            <p class="text-xs text-slate-500 mt-1">Prøv et andet sagsnr. eller opret manuelt</p>
+          </div>`;
+        lucide.createIcons();
+        return;
+      }
+
+      cases.forEach(c => {
+        const isSelected = currentFlow.case && currentFlow.case.id === c.id;
+        const card = document.createElement('button');
+        card.className = `w-full text-left p-3.5 rounded-2xl border-2 transition active:scale-[0.98] flex items-center justify-between group ${
+          isSelected 
+            ? 'bg-slate-800 border-orange-500 shadow-md' 
+            : 'bg-slate-800/80 hover:bg-slate-800 border-slate-700/80 hover:border-slate-600'
+        }`;
+        card.onclick = () => selectCase(c);
+
+        card.innerHTML = `
+          <div class="flex items-start space-x-3 overflow-hidden">
+            <div class="w-11 h-11 rounded-xl ${isSelected ? 'bg-orange-600 text-white' : 'bg-slate-700/60 text-orange-400'} flex flex-col items-center justify-center shrink-0 font-extrabold text-xs">
+              <span>${c.id}</span>
+            </div>
+            <div class="overflow-hidden">
+              <div class="flex items-center space-x-2">
+                <span class="text-xs font-bold text-orange-400">${c.number}</span>
+                ${c.popular ? '<span class="bg-orange-500/20 text-orange-300 text-[10px] font-bold px-1.5 py-0.2 rounded">Aktiv</span>' : ''}
+              </div>
+              <h4 class="text-base font-bold text-white group-hover:text-orange-400 transition truncate">${c.name}</h4>
+              <p class="text-xs text-slate-400 truncate flex items-center mt-0.5">
+                <i data-lucide="map-pin" class="w-3 h-3 mr-1 text-slate-500 shrink-0"></i>
+                <span class="truncate">${c.address}</span>
+              </p>
+            </div>
+          </div>
+          <div class="ml-2 shrink-0">
+            <div class="w-7 h-7 rounded-full bg-slate-700/50 flex items-center justify-center text-slate-400 group-hover:bg-orange-500 group-hover:text-white transition">
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      lucide.createIcons();
+    }
+
+    function selectCase(c) {
+      currentFlow.case = c;
+      currentFlow.address = c.address;
+      
+      const addrInput = document.getElementById('order-address');
+      if (addrInput) addrInput.value = c.address;
+
+      const returnLoc = document.getElementById('return-location');
+      if (returnLoc) returnLoc.value = `${c.address} (Står samlet på europalle ved container)`;
+
+      document.getElementById('supplier-screen-case-info').textContent = `${c.number} - ${c.name}`;
+      
+      switchScreen('screen-supplier');
+    }
+
+    function filterCases() {
+      const query = document.getElementById('case-search-input').value.toLowerCase().trim();
+      const clearBtn = document.getElementById('case-search-clear');
+      
+      if (query.length > 0) {
+        clearBtn.classList.remove('hidden');
+      } else {
+        clearBtn.classList.add('hidden');
+      }
+
+      const filtered = DEFAULT_CASES.filter(c => {
+        const matchesQuery = c.number.toLowerCase().includes(query) ||
+                             c.name.toLowerCase().includes(query) ||
+                             c.address.toLowerCase().includes(query) ||
+                             c.manager.toLowerCase().includes(query);
+        const matchesFilter = (activeFilter === 'alle') ? true : (c.type === activeFilter || c.address.includes(activeFilter));
+        return matchesQuery && matchesFilter;
+      });
+
+      renderCasesList(filtered);
+    }
+
+    function clearCaseSearch() {
+      document.getElementById('case-search-input').value = '';
+      filterCases();
+    }
+
+    function quickFilterCases(filterType) {
+      activeFilter = filterType;
+      document.querySelectorAll('.chip-filter').forEach(chip => {
+        chip.className = 'chip-filter px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold shrink-0 border border-slate-700';
+      });
+      event.target.className = 'chip-filter active px-3 py-1.5 rounded-xl bg-orange-600 text-white font-bold shrink-0 transition';
+      filterCases();
+    }
+
+    function promptManualCase() {
+      const nr = prompt('Indtast sagsnummer (f.eks. Sag 2430):', 'Sag 2430');
+      if (!nr) return;
+      const title = prompt('Indtast sagsnavn / byggeplads:', 'Ny Plads Aarhus');
+      const addr = prompt('Indtast pladsadresse:', 'Hovedgaden 1, 8000 Aarhus');
+
+      const customCase = {
+        id: nr.replace(/\D/g, '') || '9999',
+        number: nr,
+        name: title || 'Ny Byggeplads',
+        type: 'Bolig',
+        address: addr || 'Aarhus',
+        manager: 'Marcus Dalland Braae',
+        popular: false
+      };
+      DEFAULT_CASES.unshift(customCase);
+      selectCase(customCase);
+    }
+
+    // ==========================================
+    // STEP 2: SUPPLIER SELECTION LOGIC
+    // ==========================================
+    function selectSupplier(name, email, desc) {
+      currentFlow.supplier = { name, email, desc };
+
+      if (appMode === 'order') {
+        // Prepare Order Form
+        document.getElementById('order-sag-text').textContent = currentFlow.case.number + ' - ' + currentFlow.case.name;
+        document.getElementById('order-leverandor-text').textContent = name;
+        setSupplierIcon('order-leverandor-icon-box', name);
+        switchScreen('screen-order');
+      } else {
+        // Prepare Return Form
+        document.getElementById('return-sag-text').textContent = currentFlow.case.number + ' - ' + currentFlow.case.name;
+        document.getElementById('return-leverandor-text').textContent = name;
+        setSupplierIcon('return-leverandor-icon-box', name);
+        switchScreen('screen-return-form');
+      }
+    }
+
+    function setSupplierIcon(elementId, name) {
+      const iconBox = document.getElementById(elementId);
+      if (!iconBox) return;
+      if (name === 'Bygma') {
+        iconBox.className = 'w-8 h-8 rounded-xl bg-red-600 text-white flex items-center justify-center shrink-0 font-bold text-xs';
+        iconBox.textContent = 'BYG';
+      } else if (name === 'STARK') {
+        iconBox.className = 'w-8 h-8 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center shrink-0 font-bold text-xs';
+        iconBox.textContent = 'STA';
+      } else if (name === 'XL-BYG') {
+        iconBox.className = 'w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 font-bold text-xs';
+        iconBox.textContent = 'XL';
+      } else if (name === 'Würth') {
+        iconBox.className = 'w-8 h-8 rounded-xl bg-red-700 border border-red-500 text-white flex items-center justify-center shrink-0 font-bold text-xs';
+        iconBox.textContent = 'WÜR';
+      }
+    }
+
+    // ==========================================
+    // STEP 3: ORDER FORM INTERACTIONS
+    // ==========================================
+    function setDeliveryType(type) {
+      currentFlow.deliveryType = type;
+      const btnDelivery = document.getElementById('btn-type-delivery');
+      const btnPickup = document.getElementById('btn-type-pickup');
+      const addrGroup = document.getElementById('delivery-address-group');
+      const addrInput = document.getElementById('order-address');
+
+      if (type === 'plads') {
+        btnDelivery.className = 'flex items-center justify-center space-x-2 py-3 px-3 rounded-xl font-bold text-xs transition bg-orange-600 text-white shadow-md';
+        btnPickup.className = 'flex items-center justify-center space-x-2 py-3 px-3 rounded-xl font-bold text-xs transition bg-transparent text-slate-400 hover:text-white';
+        addrGroup.classList.remove('hidden');
+        addrInput.value = currentFlow.case.address;
+      } else {
+        btnPickup.className = 'flex items-center justify-center space-x-2 py-3 px-3 rounded-xl font-bold text-xs transition bg-orange-600 text-white shadow-md';
+        btnDelivery.className = 'flex items-center justify-center space-x-2 py-3 px-3 rounded-xl font-bold text-xs transition bg-transparent text-slate-400 hover:text-white';
+        addrGroup.classList.remove('hidden');
+        addrInput.value = `Afhentes i ${currentFlow.supplier.name} Drive-in (Nærmeste afdeling Aarhus)`;
+      }
+      lucide.createIcons();
+    }
+
+    function setTimePreset(presetText) {
+      document.getElementById('order-time-custom').value = presetText;
+      
+      document.querySelectorAll('.time-btn').forEach(btn => {
+        btn.className = 'time-btn p-2.5 rounded-xl border border-slate-700 bg-slate-800/90 text-left hover:border-orange-500 transition active:scale-95';
+      });
+      event.currentTarget.className = 'time-btn active border-2 border-orange-500 bg-orange-950/30 p-2.5 rounded-xl text-left transition active:scale-95';
+      lucide.createIcons();
+    }
+
+    function appendMaterialTag(text) {
+      const textarea = document.getElementById('order-materials');
+      if (textarea.value.trim().length > 0) {
+        textarea.value += '\n• ' + text;
+      } else {
+        textarea.value = '• ' + text;
+      }
+      textarea.focus();
+    }
+
+    // ==========================================
+    // STEP 3B: RETURN FORM INTERACTIONS
+    // ==========================================
+    function setReturnMethod(method) {
+      currentFlow.deliveryType = method;
+      const btnPickup = document.getElementById('btn-return-pickup');
+      const btnDropoff = document.getElementById('btn-return-dropoff');
+      const locInput = document.getElementById('return-location');
+
+      if (method === 'afhent') {
+        btnPickup.className = 'flex items-center justify-center space-x-2 py-3 px-3 rounded-xl font-bold text-xs transition bg-amber-600 text-white shadow-md';
+        btnDropoff.className = 'flex items-center justify-center space-x-2 py-3 px-3 rounded-xl font-bold text-xs transition bg-transparent text-slate-400 hover:text-white';
+        locInput.value = `${currentFlow.case.address} (Står samlet på europalle ved container 2)`;
+      } else {
+        btnDropoff.className = 'flex items-center justify-center space-x-2 py-3 px-3 rounded-xl font-bold text-xs transition bg-amber-600 text-white shadow-md';
+        btnPickup.className = 'flex items-center justify-center space-x-2 py-3 px-3 rounded-xl font-bold text-xs transition bg-transparent text-slate-400 hover:text-white';
+        locInput.value = `Indleveret i ${currentFlow.supplier.name} håndværkerbutik af svend`;
+      }
+      lucide.createIcons();
+    }
+
+    function appendReturnTag(text) {
+      const textarea = document.getElementById('return-materials');
+      if (textarea.value.trim().length > 0) {
+        textarea.value += '\n• ' + text;
+      } else {
+        textarea.value = '• ' + text;
+      }
+      textarea.focus();
+    }
+
+    // ==========================================
+    // SPEECH-TO-TEXT (REAL + SIMULATION)
+    // ==========================================
+    function initSpeechRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        speechRecognitionInstance = new SpeechRecognition();
+        speechRecognitionInstance.lang = 'da-DK';
+        speechRecognitionInstance.continuous = true;
+        speechRecognitionInstance.interimResults = false;
+
+        speechRecognitionInstance.onresult = (event) => {
+          const transcript = event.results[event.results.length - 1][0].transcript.trim();
+          if (appMode === 'return') {
+            appendReturnTag(transcript);
+          } else {
+            appendMaterialTag(transcript);
+          }
+        };
+
+        speechRecognitionInstance.onerror = (event) => {
+          console.log('Speech recognition fallback activated:', event.error);
+        };
+
+        speechRecognitionInstance.onend = () => {
+          if (isRecordingSpeech) stopVoiceDictation();
+        };
+      }
+    }
+
+    function toggleVoiceDictation(targetFlow) {
+      if (!isRecordingSpeech) {
+        startVoiceDictation(targetFlow);
+      } else {
+        stopVoiceDictation();
+      }
+    }
+
+    function startVoiceDictation(targetFlow) {
+      isRecordingSpeech = true;
+      document.getElementById('voice-listening-toast').classList.remove('hidden');
+      
+      if (targetFlow === 'return') {
+        document.getElementById('voice-btn-label-return').textContent = 'Stopper...';
+        document.getElementById('mic-pulse-indicator-return').classList.add('recording-pulse');
+      } else {
+        document.getElementById('voice-btn-label').textContent = 'Stopper...';
+        document.getElementById('mic-pulse-indicator').classList.add('recording-pulse');
+      }
+
+      if (speechRecognitionInstance) {
+        try {
+          speechRecognitionInstance.start();
+          return;
+        } catch(e) {
+          console.log('Using simulated speech dictation due to browser policy');
+        }
+      }
+
+      // Simulated contractor voice inputs
+      const orderPhrases = [
+        "10 pakker Würth 4,5 gange 60 terasseskruer A4",
+        "15 stykker 45 gange 95 reglar i 4 meter og 20",
+        "2 ruller dampspærre og 3 tuber montagelim"
+      ];
+      const returnPhrases = [
+        "5 uåbnede pakker gipsskruer 3,9 gange 30",
+        "12 stykker 45 gange 195 spærtræ i 4 meter 80 ubrugt",
+        "4 tomme Bygma returpaller klar til afhentning"
+      ];
+
+      const phrases = (targetFlow === 'return') ? returnPhrases : orderPhrases;
+      let phraseIdx = 0;
+      window.voiceSimTimer = setInterval(() => {
+        if (phraseIdx < phrases.length) {
+          if (targetFlow === 'return') {
+            appendReturnTag(phrases[phraseIdx]);
+          } else {
+            appendMaterialTag(phrases[phraseIdx]);
+          }
+          phraseIdx++;
+        } else {
+          stopVoiceDictation();
+        }
+      }, 1400);
+    }
+
+    function stopVoiceDictation() {
+      isRecordingSpeech = false;
+      document.getElementById('voice-listening-toast').classList.add('hidden');
+      document.getElementById('voice-btn-label').textContent = 'Tryk og tal';
+      document.getElementById('voice-btn-label-return').textContent = 'Tryk og tal';
+      document.getElementById('mic-pulse-indicator').classList.remove('recording-pulse');
+      document.getElementById('mic-pulse-indicator-return').classList.remove('recording-pulse');
+
+      if (speechRecognitionInstance) {
+        try { speechRecognitionInstance.stop(); } catch(e) {}
+      }
+      if (window.voiceSimTimer) {
+        clearInterval(window.voiceSimTimer);
+      }
+      lucide.createIcons();
+    }
+
+    // ==========================================
+    // PHOTO UPLOAD / ATTACHMENT
+    // ==========================================
+    function handlePhotoUpload(event, type) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setPhotoPreview(e.target.result, file.name, type);
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function simulatePhotoAttachment(type) {
+      if (type === 'return') {
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300">
+          <rect width="300" height="300" fill="#fef3c7"/>
+          <rect x="20" y="20" width="260" height="260" rx="10" fill="#ffffff" stroke="#f59e0b" stroke-width="3"/>
+          <text x="35" y="55" font-family="sans-serif" font-size="14" font-weight="bold" fill="#92400e">A/S NORTVIG - RETURSEDDEL</text>
+          <line x1="35" y1="65" x2="265" y2="65" stroke="#f59e0b" stroke-width="1.5"/>
+          <text x="35" y="95" font-family="sans-serif" font-size="12" fill="#1f2937">Sag: Sag 2401 Risskov</text>
+          <text x="35" y="120" font-family="sans-serif" font-size="12" fill="#1f2937">Leverandør: Bygma</text>
+          <text x="35" y="150" font-family="sans-serif" font-size="11" fill="#374151">• 5 pk gipsskruer (uåbnet)</text>
+          <text x="35" y="175" font-family="sans-serif" font-size="11" fill="#374151">• 12 stk spærtræ 45x195 4.8m</text>
+          <text x="35" y="200" font-family="sans-serif" font-size="11" fill="#374151">• 4 stk Bygma EUR-paller</text>
+          <rect x="35" y="225" width="230" height="35" fill="#fef3c7" rx="5"/>
+          <text x="45" y="247" font-family="sans-serif" font-size="11" font-weight="bold" fill="#b45309">EPIKUR CREDIT WATCH AKTIV</text>
+        </svg>`;
+        const dataUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+        setPhotoPreview(dataUrl, 'returseddel_plads_2401.jpg', 'return');
+      } else {
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300">
+          <rect width="300" height="300" fill="#f8fafc"/>
+          <line x1="20" y1="40" x2="280" y2="40" stroke="#cbd5e1" stroke-width="2"/>
+          <line x1="20" y1="80" x2="280" y2="80" stroke="#cbd5e1" stroke-width="2"/>
+          <line x1="20" y1="120" x2="280" y2="120" stroke="#cbd5e1" stroke-width="2"/>
+          <text x="30" y="32" font-family="sans-serif" font-size="14" font-weight="bold" fill="#0f172a">SAG 2401 - BESTILLING</text>
+          <text x="30" y="72" font-family="sans-serif" font-size="13" fill="#334155">- 10 pk Würth skruer 4,5x60</text>
+          <text x="30" y="112" font-family="sans-serif" font-size="13" fill="#334155">- 15 stk 45x95 reglar</text>
+          <text x="30" y="240" font-family="sans-serif" font-size="11" fill="#ea580c" font-weight="bold">A/S NORTVIG BYGGEPLADS</text>
+        </svg>`;
+        const dataUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+        setPhotoPreview(dataUrl, 'seddel_risskov_plads.jpg', 'order');
+      }
+    }
+
+    function setPhotoPreview(src, filename, type) {
+      currentFlow.photo = { src, filename };
+      if (type === 'return') {
+        document.getElementById('return-photo-preview-img').src = src;
+        document.getElementById('return-photo-filename').textContent = filename;
+        document.getElementById('return-photo-preview-box').classList.remove('hidden');
+      } else {
+        document.getElementById('photo-preview-img').src = src;
+        document.getElementById('photo-filename').textContent = filename;
+        document.getElementById('photo-preview-box').classList.remove('hidden');
+      }
+      lucide.createIcons();
+    }
+
+    function removePhotoAttachment(type) {
+      currentFlow.photo = null;
+      if (type === 'return') {
+        document.getElementById('return-photo-preview-box').classList.add('hidden');
+        document.getElementById('return-photo-input').value = '';
+      } else {
+        document.getElementById('photo-preview-box').classList.add('hidden');
+        document.getElementById('order-photo-input').value = '';
+      }
+    }
+
+    // ==========================================
+    // STEP 4: SUBMISSION LOGIC (ORDER & RETURN)
+    // ==========================================
+    function handleOrderSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submit-order-btn');
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader-2" class="w-6 h-6 animate-spin"></i><span>SENDER TIL ${currentFlow.supplier.name.toUpperCase()}...</span>`;
+      lucide.createIcons();
+
+      currentFlow.materials = document.getElementById('order-materials').value;
+      currentFlow.time = document.getElementById('order-time-custom').value;
+      currentFlow.address = document.getElementById('order-address').value;
+      currentFlow.sender = document.getElementById('order-sender').value;
+      currentFlow.phone = document.getElementById('order-phone').value;
+      currentFlow.note = document.getElementById('order-note').value;
+      currentFlow.timestamp = new Date().toISOString();
+
+      const randomCode = Math.floor(1000 + Math.random() * 9000);
+      currentFlow.id = `NTV-2026-${randomCode}`;
+      currentFlow.type = 'order';
+
+      setTimeout(() => {
+        saveItemToStorage({ ...currentFlow });
+        renderReceipt(currentFlow);
+        switchScreen('screen-receipt');
+
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="send" class="w-6 h-6"></i><span class="tracking-wide">SEND BESTILLING NU</span>`;
+        showToast('Bestilling Afsendt', `Ordre ${currentFlow.id} sendt til ${currentFlow.supplier.name}`);
+        lucide.createIcons();
+      }, 700);
+    }
+
+    function handleReturnSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submit-return-btn');
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader-2" class="w-6 h-6 animate-spin"></i><span>OPRETTER RETURSAG & ADVISERER SÆLGER...</span>`;
+      lucide.createIcons();
+
+      currentFlow.materials = document.getElementById('return-materials').value;
+      currentFlow.address = document.getElementById('return-location').value;
+      currentFlow.estimatedVal = parseFloat(document.getElementById('return-estimated-val').value) || 3400;
+      currentFlow.reason = document.getElementById('return-reason').value;
+      currentFlow.sender = document.getElementById('return-sender').value;
+      currentFlow.phone = document.getElementById('return-phone').value;
+      currentFlow.timestamp = new Date().toISOString();
+      currentFlow.type = 'return';
+
+      // Required unique Return ID: RET-2026-XXXX
+      const randomCode = Math.floor(1000 + Math.random() * 9000);
+      currentFlow.id = `RET-2026-${randomCode}`;
+
+      setTimeout(() => {
+        saveItemToStorage({ ...currentFlow });
+
+        // Add dynamically to Admin Pending Returns list!
+        adminPendingReturns.unshift({
+          id: currentFlow.id,
+          case: `${currentFlow.case.number} - ${currentFlow.case.name}`,
+          supplier: currentFlow.supplier.name,
+          materials: currentFlow.materials.split('\n').slice(0, 2).join(' + '),
+          estimatedVal: `${currentFlow.estimatedVal.toLocaleString('da-DK')},00 DKK`,
+          daysOld: 0,
+          status: `Afventer kreditnota fra ${currentFlow.supplier.name} (Oprettet i dag)`,
+          pickupMethod: (currentFlow.deliveryType === 'afhent') ? 'Afhentes på byggeplads' : 'Afleveret i butik',
+          reminded: false,
+          createdDate: 'I dag'
+        });
+
+        renderReceipt(currentFlow);
+        switchScreen('screen-receipt');
+
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="rotate-ccw" class="w-6 h-6"></i><span class="tracking-wide">MELD RETURVARE NU</span>`;
+        showToast('Returvare Oprettet!', `Epikur Credit Watch aktiveret for ${currentFlow.id}`);
+        lucide.createIcons();
+      }, 800);
+    }
+
+    function renderReceipt(item) {
+      document.getElementById('receipt-order-id').textContent = item.id;
+      document.getElementById('receipt-sag').textContent = `${item.case.number} - ${item.case.name}`;
+      document.getElementById('receipt-supplier').textContent = item.supplier.name;
+      document.getElementById('receipt-materials-list').textContent = item.materials;
+
+      const heroIconBox = document.getElementById('receipt-hero-icon-box');
+      const heroIcon = document.getElementById('receipt-hero-icon');
+      const typePill = document.getElementById('receipt-type-pill');
+      const headerTitle = document.getElementById('receipt-header-title');
+      const detailTypeLabel = document.getElementById('receipt-detail-type-label');
+      const simBtn = document.getElementById('receipt-simulation-cta');
+
+      if (item.type === 'return') {
+        heroIconBox.className = 'w-20 h-20 bg-amber-500/20 text-amber-400 rounded-3xl border-2 border-amber-500/40 flex items-center justify-center mx-auto mb-3 shadow-xl shadow-amber-950/50 glow-pulse';
+        heroIcon.setAttribute('data-lucide', 'rotate-ccw');
+        typePill.className = 'inline-block px-3 py-1 bg-amber-500/20 text-amber-300 font-bold text-xs rounded-full border border-amber-500/30 mb-2';
+        typePill.textContent = 'RETURSAG REGISTRERET & ADVISERET';
+        headerTitle.textContent = 'Retursagsnummer';
+
+        document.getElementById('receipt-order-id').className = 'text-2xl font-mono font-black text-amber-400 mt-1 tracking-wider select-all';
+
+        document.getElementById('receipt-action-1-title').textContent = 'Advisering sendt til trælast-sælger:';
+        document.getElementById('receipt-supplier-mail-info').textContent = 
+          `Trælast-sælger hos ${item.supplier.name} underrettet om afhentning på ${item.address} (Retur-ID: ${item.id}).`;
+
+        document.getElementById('receipt-action-2-title').textContent = 'E-komplet sagssynkronisering:';
+        document.getElementById('receipt-action-2-desc').textContent = 
+          `Oprettet som forventet kreditering (ca. ${item.estimatedVal || 3400} DKK) på sagsmappen for ${item.case.number}.`;
+
+        document.getElementById('receipt-action-3-title').textContent = 'Epikur Credit Watch Aktiveret:';
+        document.getElementById('receipt-action-3-desc').textContent = 
+          `Epikur overvåger løbende E-komplet indbakken for den modsvarende kreditnota fra ${item.supplier.name}.`;
+
+        detailTypeLabel.textContent = 'Afhentning / Placering:';
+        document.getElementById('receipt-delivery-time').textContent = item.address;
+        simBtn.classList.add('hidden');
+
+      } else {
+        // Order view
+        heroIconBox.className = 'w-20 h-20 bg-emerald-500/20 text-emerald-400 rounded-3xl border-2 border-emerald-500/40 flex items-center justify-center mx-auto mb-3 shadow-xl shadow-emerald-950/50';
+        heroIcon.setAttribute('data-lucide', 'check-circle-2');
+        typePill.className = 'inline-block px-3 py-1 bg-emerald-500/20 text-emerald-300 font-bold text-xs rounded-full border border-emerald-500/30 mb-2';
+        typePill.textContent = 'BESTILLING GENNEMFØRT';
+        headerTitle.textContent = 'Ordrereference';
+
+        document.getElementById('receipt-order-id').className = 'text-2xl font-mono font-black text-orange-400 mt-1 tracking-wider select-all';
+
+        document.getElementById('receipt-action-1-title').textContent = 'Mail afsendt til leverandør:';
+        document.getElementById('receipt-supplier-mail-info').textContent = 
+          `Sendt til ${item.supplier.email} med reference ${item.id} & levering til ${item.address}`;
+
+        document.getElementById('receipt-action-2-title').textContent = 'E-komplet integration:';
+        document.getElementById('receipt-action-2-desc').textContent = 'Oprettet som afventende indkøbsordre på sagsmappen.';
+
+        document.getElementById('receipt-action-3-title').textContent = 'Epikur AI 3-Vejs Match:';
+        document.getElementById('receipt-action-3-desc').textContent = 'Klar til automatisk kontrol så snart leverandørfakturaen rammer indbakken.';
+
+        detailTypeLabel.textContent = 'Levering:';
+        document.getElementById('receipt-delivery-time').textContent = item.time;
+        simBtn.classList.remove('hidden');
+
+        // Update simulation labels
+        document.getElementById('sim-order-ref').textContent = item.id;
+        document.getElementById('sim-sag-label').textContent = `${item.case.number} - ${item.case.name}`;
+        document.getElementById('sim-sup-label').textContent = item.supplier.name;
+        document.getElementById('sim-ordered-items').textContent = item.materials.split('\n')[0] || '10 pk. Terrasseskruer';
+      }
+
+      lucide.createIcons();
+    }
+
+    function switchToAdminFromReceipt() {
+      toggleAdminView();
+    }
+
+    function startNewFlow() {
+      if (appMode === 'return') {
+        document.getElementById('return-materials').value = '';
+        removePhotoAttachment('return');
+        switchScreen('screen-case');
+      } else {
+        document.getElementById('order-materials').value = '';
+        document.getElementById('order-note').value = '';
+        removePhotoAttachment('order');
+        switchScreen('screen-case');
+      }
+    }
+
+    // ==========================================
+    // LOCALSTORAGE PERSISTENCE
+    // ==========================================
+    function getStoredItems() {
+      try {
+        const data = localStorage.getItem('nortvig_app_items_v2');
+        return data ? JSON.parse(data) : [];
+      } catch(e) {
+        return [];
+      }
+    }
+
+    function saveItemToStorage(item) {
+      const items = getStoredItems();
+      items.unshift(item);
+      localStorage.setItem('nortvig_app_items_v2', JSON.stringify(items));
+      updateHistoryBadge();
+      renderHistoryScreen();
+    }
+
+    function updateHistoryBadge() {
+      const items = getStoredItems();
+      const badge = document.getElementById('order-badge');
+      if (items.length > 0) {
+        badge.textContent = items.length;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+    }
+
+    function filterHistoryDisplay(filter) {
+      historyFilter = filter;
+      document.getElementById('hist-tab-all').className = (filter === 'all') ? 'flex-1 py-1.5 rounded-lg bg-orange-600 text-white transition' : 'flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white transition';
+      document.getElementById('hist-tab-orders').className = (filter === 'orders') ? 'flex-1 py-1.5 rounded-lg bg-orange-600 text-white transition' : 'flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white transition';
+      document.getElementById('hist-tab-returns').className = (filter === 'returns') ? 'flex-1 py-1.5 rounded-lg bg-orange-600 text-white transition' : 'flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white transition';
+      renderHistoryScreen();
+    }
+
+    function renderHistoryScreen() {
+      const items = getStoredItems();
+      const container = document.getElementById('history-orders-list');
+      container.innerHTML = '';
+
+      const filtered = items.filter(i => {
+        if (historyFilter === 'orders') return i.type !== 'return';
+        if (historyFilter === 'returns') return i.type === 'return';
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12 text-slate-400">
+            <i data-lucide="clipboard-x" class="w-10 h-10 mx-auto mb-2 text-slate-600"></i>
+            <p class="text-sm font-bold text-slate-300">Ingen registreringer fundet</p>
+            <p class="text-xs text-slate-500 mt-1">Bestillinger og retursager oprettet i appen gemmes her.</p>
+          </div>`;
+        lucide.createIcons();
+        return;
+      }
+
+      filtered.forEach(o => {
+        const isRetur = o.type === 'return';
+        const item = document.createElement('div');
+        item.className = `p-3.5 rounded-2xl border space-y-2 ${isRetur ? 'bg-slate-800/95 border-amber-500/40' : 'bg-slate-800 border-slate-700'}`;
+        item.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <span class="font-mono text-xs font-bold ${isRetur ? 'text-amber-400' : 'text-orange-400'}">${o.id}</span>
+              <span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${isRetur ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}">
+                ${isRetur ? 'Returvare • Watcher Aktiv' : 'Bestilling • Afsendt'}
+              </span>
+            </div>
+            <span class="text-[10px] text-slate-400">${new Date(o.timestamp || Date.now()).toLocaleDateString('da-DK', { hour: '2-digit', minute: '2-digit' })}</span>
+          </div>
+          <div class="text-xs">
+            <div class="font-bold text-white">${o.case ? o.case.number + ' - ' + o.case.name : 'Sag'}</div>
+            <div class="text-slate-400 mt-0.5">${isRetur ? 'Trælast:' : 'Leverandør:'} <span class="text-slate-200 font-semibold">${o.supplier ? o.supplier.name : ''}</span></div>
+          </div>
+          <div class="bg-slate-900/80 p-2 rounded-xl text-xs font-mono text-slate-300 whitespace-pre-line border border-slate-850">
+            ${o.materials}
+          </div>
+          <div class="flex items-center justify-between pt-1">
+            ${isRetur ? `
+              <span class="text-xs text-amber-400 font-semibold flex items-center space-x-1">
+                <i data-lucide="radar" class="w-3.5 h-3.5"></i>
+                <span>Epikur overvåger kreditnota</span>
+              </span>
+            ` : `
+              <button onclick="simulateThreeWayForOrder('${o.id}')" class="text-xs text-orange-400 hover:text-orange-300 font-bold flex items-center space-x-1">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                <span>Se Epikur 3-vejs match</span>
+              </button>
+            `}
+            <span class="text-[10px] text-slate-500 font-medium">Logget i E-komplet</span>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+
+      lucide.createIcons();
+    }
+
+    // ==========================================
+    // ADMIN DASHBOARD & CONTROLS (MARCUS VIEW)
+    // ==========================================
+    function renderAdminDashboard() {
+      // 1. Render Discrepancies
+      const discList = document.getElementById('discrepancy-list');
+      const discCounter = document.getElementById('discrepancy-counter-tag');
+      const discHeaderBadge = document.getElementById('discrepancy-badge-header');
+
+      discCounter.textContent = `${adminDiscrepancies.length} afventer handling`;
+      discHeaderBadge.textContent = adminDiscrepancies.length;
+
+      if (adminDiscrepancies.length === 0) {
+        discList.innerHTML = `
+          <div class="p-6 text-center text-slate-400">
+            <i data-lucide="check-circle" class="w-8 h-8 text-emerald-400 mx-auto mb-2"></i>
+            <p class="font-bold text-white text-sm">Alle fakturaer stemmer overens</p>
+            <p class="text-xs text-slate-500 mt-1">Epikur har automatisk godkendt alle indkomne fakturaer mod rekvisitioner.</p>
+          </div>
+        `;
+      } else {
+        discList.innerHTML = '';
+        adminDiscrepancies.forEach((d, idx) => {
+          const item = document.createElement('div');
+          item.className = 'p-3 sm:p-4 rounded-2xl bg-slate-900/90 border border-red-500/40 space-y-3';
+          item.innerHTML = `
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div class="flex items-center space-x-2">
+                <span class="px-2 py-0.5 rounded text-[10px] font-black bg-red-600/30 text-red-400 border border-red-500/40 uppercase">
+                  ${d.type}
+                </span>
+                <span class="font-mono text-xs font-bold text-white">${d.invoiceNo}</span>
+                <span class="text-slate-500">|</span>
+                <span class="text-xs font-bold text-orange-400">${d.supplier}</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="text-xs font-bold text-slate-400">Differens:</span>
+                <span class="text-sm font-black text-red-400">${d.priceDiff}</span>
+              </div>
+            </div>
+
+            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs font-mono space-y-1">
+              <div class="text-slate-400">Sag: <span class="text-white font-semibold">${d.case}</span></div>
+              <div class="text-slate-400">Bestilt i App: <span class="text-emerald-400 font-semibold">${d.ordered}</span></div>
+              <div class="text-slate-400">Faktureret i E-komplet: <span class="text-red-400 font-bold">${d.invoiced}</span></div>
+              <div class="text-slate-300 pt-1 text-[11px]">${d.issueDesc}</div>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+              <div class="text-[11px] text-slate-400 flex items-center">
+                <i data-lucide="clock" class="w-3.5 h-3.5 mr-1 text-slate-500"></i>
+                <span>Fundet af Epikur: ${d.date}</span>
+              </div>
+
+              <div class="flex items-center space-x-2">
+                <!-- 1-Click Protest Button -->
+                <button onclick="sendProtestMail('${d.id}', '${d.supplier}', '${d.invoiceNo}')"
+                  class="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white rounded-xl text-xs font-bold flex items-center space-x-1.5 shadow-md active:scale-95 transition">
+                  <i data-lucide="mail-warning" class="w-3.5 h-3.5"></i>
+                  <span>Send indsigelse (1-klik)</span>
+                </button>
+
+                <!-- Reject in E-komplet Button -->
+                <button onclick="rejectInEkomplet('${d.id}', '${d.invoiceNo}')"
+                  class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-xl text-xs font-semibold active:scale-95 transition">
+                  <span>Afvis i E-komplet</span>
+                </button>
+              </div>
+            </div>
+          `;
+          discList.appendChild(item);
+        });
+      }
+
+      // 2. Render Pending Returns
+      const retList = document.getElementById('pending-returns-list');
+      const retCountKpi = document.getElementById('kpi-pending-returns-count');
+      const retValKpi = document.getElementById('kpi-pending-returns-val');
+
+      retCountKpi.textContent = `${adminPendingReturns.length} sager`;
+
+      let totalVal = adminPendingReturns.reduce((acc, r) => {
+        const num = parseFloat(r.estimatedVal.replace(/[^\d]/g, '')) || 0;
+        return acc + num;
+      }, 0);
+      retValKpi.textContent = `${totalVal.toLocaleString('da-DK')} kr.`;
+
+      if (adminPendingReturns.length === 0) {
+        retList.innerHTML = `
+          <div class="p-6 text-center text-slate-400">
+            <i data-lucide="check-circle-2" class="w-8 h-8 text-emerald-400 mx-auto mb-2"></i>
+            <p class="font-bold text-white text-sm">Ingen udestående retursager</p>
+            <p class="text-xs text-slate-500 mt-1">Alle godkendte kreditnotaer er modtaget og udlignet i E-komplet.</p>
+          </div>
+        `;
+      } else {
+        retList.innerHTML = '';
+        adminPendingReturns.forEach((r, idx) => {
+          const item = document.createElement('div');
+          const isOlder = r.daysOld >= 7;
+          item.className = `p-3 sm:p-4 rounded-2xl bg-slate-900/90 border ${isOlder ? 'border-amber-500/50' : 'border-slate-700'} space-y-3`;
+          item.innerHTML = `
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div class="flex items-center space-x-2">
+                <span class="px-2 py-0.5 rounded text-[10px] font-black ${isOlder ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-slate-800 text-slate-300'} font-mono uppercase">
+                  ${r.id}
+                </span>
+                <span class="text-xs font-bold text-white">${r.supplier}</span>
+                <span class="text-slate-500">|</span>
+                <span class="text-xs text-slate-400">${r.case}</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="text-xs text-slate-400">Estimeret kredit:</span>
+                <span class="text-sm font-black text-amber-400">${r.estimatedVal}</span>
+              </div>
+            </div>
+
+            <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 text-xs font-mono space-y-1">
+              <div class="text-slate-300"><span class="text-slate-500">Varer:</span> ${r.materials}</div>
+              <div class="text-slate-400 text-[11px]"><span class="text-slate-500">Status:</span> ${r.status} (${r.pickupMethod})</div>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+              <div class="text-[11px] ${isOlder ? 'text-amber-400 font-bold' : 'text-slate-400'} flex items-center">
+                <i data-lucide="hourglass" class="w-3.5 h-3.5 mr-1"></i>
+                <span>${r.daysOld} dage siden returmelding (${r.createdDate})</span>
+              </div>
+
+              <div class="flex items-center space-x-2">
+                <!-- Rykkerservice knap med Epikur -->
+                <button onclick="sendCreditReminder('${r.id}', '${r.supplier}')"
+                  class="px-3 py-1.5 ${r.reminded ? 'bg-slate-800 text-slate-400 border border-slate-700' : 'bg-amber-600 hover:bg-amber-500 text-white shadow-md'} rounded-xl text-xs font-bold flex items-center space-x-1.5 active:scale-95 transition">
+                  <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                  <span>${r.reminded ? 'Rykker 1 afsendt' : 'Rykkerservice med Epikur'}</span>
+                </button>
+
+                <!-- Mark as matched button -->
+                <button onclick="markCreditNoteReceived('${r.id}')"
+                  class="px-3 py-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/40 rounded-xl text-xs font-bold active:scale-95 transition">
+                  <span>Godkend Kreditnota</span>
+                </button>
+              </div>
+            </div>
+          `;
+          retList.appendChild(item);
+        });
+      }
+
+      lucide.createIcons();
+    }
+
+    function sendProtestMail(discId, supplier, invoiceNo) {
+      showToast('Indsigelse Afsendt!', `Automatisk brev sendt til ${supplier} sælger vedr. ${invoiceNo}. Sat på pause i E-komplet.`);
+      adminDiscrepancies = adminDiscrepancies.filter(d => d.id !== discId);
+      renderAdminDashboard();
+    }
+
+    function rejectInEkomplet(discId, invoiceNo) {
+      showToast('Faktura Afvist', `${invoiceNo} afvist med bemærkning og logget i E-komplet.`);
+      adminDiscrepancies = adminDiscrepancies.filter(d => d.id !== discId);
+      renderAdminDashboard();
+    }
+
+    function sendCreditReminder(returnId, supplier) {
+      const match = adminPendingReturns.find(r => r.id === returnId);
+      if (match) {
+        match.reminded = true;
+        match.status = `Rykker sendt til ${supplier} sælger i dag`;
+      }
+      showToast('Epikur Rykker Afsendt', `Sælger hos ${supplier} er rykket for manglende kreditnota for ${returnId}.`);
+      renderAdminDashboard();
+    }
+
+    function markCreditNoteReceived(returnId) {
+      adminPendingReturns = adminPendingReturns.filter(r => r.id !== returnId);
+      showToast('Kreditnota Modtaget & Udliget!', `Kreditnota for ${returnId} er automatisk bogført på sagen i E-komplet.`);
+      renderAdminDashboard();
+    }
+
+    function refreshAdminData() {
+      showToast('Synkroniseret med E-komplet', 'Seneste 24 timers fakturaer og følgesedler er kontrolleret af Epikur.');
+      renderAdminDashboard();
+    }
+
+    // ==========================================
+    // TOAST SYSTEM
+    // ==========================================
+    function showToast(title, desc) {
+      const toast = document.getElementById('global-toast');
+      const tTitle = document.getElementById('toast-title');
+      const tDesc = document.getElementById('toast-desc');
+      const iconBox = document.getElementById('toast-icon-box');
+
+      tTitle.textContent = title;
+      tDesc.textContent = desc;
+      iconBox.className = 'w-8 h-8 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center shrink-0 border border-orange-500/30';
+
+      toast.classList.remove('hidden');
+      if (window.toastTimer) clearTimeout(window.toastTimer);
+      window.toastTimer = setTimeout(() => {
+        hideToast();
+      }, 4000);
+      lucide.createIcons();
+    }
+
+    function hideToast() {
+      document.getElementById('global-toast').classList.add('hidden');
+    }
+
+    // ==========================================
+    // EPIKUR 3-WAY MATCH SIMULATION
+    // ==========================================
+    function toggleThreeWayModal(show) {
+      const modal = document.getElementById('three-way-modal');
+      if (show) {
+        modal.classList.remove('hidden');
+        updateSimulationView();
+      } else {
+        modal.classList.add('hidden');
+      }
+      lucide.createIcons();
+    }
+
+    function setSimulationScenario(scenario) {
+      simulationScenario = scenario;
+      const errBtn = document.getElementById('sim-scenario-error-btn');
+      const okBtn = document.getElementById('sim-scenario-ok-btn');
+
+      if (scenario === 'error') {
+        errBtn.className = 'px-2.5 py-1 rounded-lg font-bold bg-red-600 text-white shadow';
+        okBtn.className = 'px-2.5 py-1 rounded-lg font-semibold text-slate-400 hover:text-white';
+      } else {
+        okBtn.className = 'px-2.5 py-1 rounded-lg font-bold bg-emerald-600 text-white shadow';
+        errBtn.className = 'px-2.5 py-1 rounded-lg font-semibold text-slate-400 hover:text-white';
+      }
+
+      updateSimulationView();
+    }
+
+    function updateSimulationView() {
+      const invoiceBox = document.getElementById('sim-invoice-box');
+      const auditResult = document.getElementById('sim-audit-result');
+
+      if (simulationScenario === 'error') {
+        invoiceBox.className = 'bg-slate-900 p-2.5 rounded-lg font-mono text-[11px] leading-relaxed border border-red-500/50 text-red-200';
+        invoiceBox.innerHTML = `
+          <div class="flex items-center justify-between text-red-400 font-bold">
+            <span>Fakturalinjer modtaget:</span>
+            <span class="text-[10px] bg-red-500/20 px-1.5 py-0.5 rounded border border-red-500/40">UOVERENSSTEMMELSE</span>
+          </div>
+          <div class="mt-1 text-slate-300">
+            Linje 1: 12 pk. Terrasseskruer 4,5x60 à <span class="line-through text-slate-500">145,-</span> <span class="text-red-400 font-bold">195,00 DKK</span>
+          </div>
+          <div class="text-slate-400">Rabat: 0% fratrukket (Nortvig aftale 35% mangler)</div>
+          <div class="text-white font-bold mt-1">Fakturabeløb: 2.340,00 DKK (Forventet: 1.450,00 DKK)</div>
+        `;
+
+        auditResult.className = 'p-3.5 rounded-xl border border-red-500/60 bg-red-950/40 text-red-200 space-y-2';
+        auditResult.innerHTML = `
+          <div class="flex items-center space-x-2 text-red-400 font-bold text-xs">
+            <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+            <span>EPIKUR AI FANGEDE PRIS- & MÆNGDEAFVIGELSE!</span>
+          </div>
+          <p class="text-[11px] text-slate-300 leading-normal">
+            Leverandørfaktura overstiger app-bestillingen med <strong class="text-red-400">+890,00 DKK</strong>. 
+            Der er faktureret for 12 pk. (modtaget 10 pk.) og enhedsprisen mangler Nortvigs 35% rammeaftalerabat.
+          </p>
+          <div class="bg-slate-900/90 p-2 rounded-lg border border-red-500/30 text-[10px] text-slate-200 font-mono">
+            ⚡ <strong>Automatisk handling:</strong> Faktura sat i bero i E-komplet og tilføjet til Discrepancy Log.
+            Epikur har forberedt 1-klik indsigelse til trælast-sælgeren.
+          </div>
+        `;
+      } else {
+        invoiceBox.className = 'bg-slate-900 p-2.5 rounded-lg font-mono text-[11px] leading-relaxed border border-emerald-500/50 text-emerald-200';
+        invoiceBox.innerHTML = `
+          <div class="flex items-center justify-between text-emerald-400 font-bold">
+            <span>Fakturalinjer modtaget:</span>
+            <span class="text-[10px] bg-emerald-500/20 px-1.5 py-0.5 rounded border border-emerald-500/40">100% MATCH</span>
+          </div>
+          <div class="mt-1 text-slate-300">
+            Linje 1: 10 pk. Terrasseskruer 4,5x60 à 145,00 DKK
+          </div>
+          <div class="text-emerald-400">Rabat: 35% Nortvig rammeaftale korrekt fratrukket</div>
+          <div class="text-white font-bold mt-1">Fakturabeløb: 1.450,00 DKK</div>
+        `;
+
+        auditResult.className = 'p-3.5 rounded-xl border border-emerald-500/60 bg-emerald-950/40 text-emerald-200 space-y-2';
+        auditResult.innerHTML = `
+          <div class="flex items-center space-x-2 text-emerald-400 font-bold text-xs">
+            <i data-lucide="check-check" class="w-4 h-4"></i>
+            <span>PERFEKT 3-VEJS MATCH GODKENDT</span>
+          </div>
+          <p class="text-[11px] text-slate-300 leading-normal">
+            App-bestilling, fysisk modtaget følgeseddel og elektronisk faktura stemmer 100% overens.
+          </p>
+          <div class="bg-slate-900/90 p-2 rounded-lg border border-emerald-500/30 text-[10px] text-slate-200 font-mono">
+            ⚡ <strong>Automatisk handling:</strong> Faktura frigives automatisk til betaling i E-komplet og bogføres direkte på Sag 2401.
+          </div>
+        `;
+      }
+      lucide.createIcons();
+    }
+
+    function openSimulationForCurrentOrder() {
+      toggleThreeWayModal(true);
+    }
+
+    function simulateThreeWayForOrder(orderId) {
+      const items = getStoredItems();
+      const match = items.find(o => o.id === orderId);
+      if (match) {
+        document.getElementById('sim-order-ref').textContent = match.id;
+        document.getElementById('sim-sag-label').textContent = `${match.case.number} - ${match.case.name}`;
+        document.getElementById('sim-sup-label').textContent = match.supplier.name;
+        document.getElementById('sim-ordered-items').textContent = match.materials.split('\n')[0] || '10 pk. Terrasseskruer';
+      }
+      toggleThreeWayModal(true);
+    }
+
+  </script>
+</body>
+</html>
