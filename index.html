@@ -1754,10 +1754,10 @@
     let currentFlow = {
       type: 'order', // 'order' or 'return'
       id: '',
-      case: null,
+      case: DEFAULT_CASES[0],
       supplier: null,
       deliveryType: 'plads', // 'plads' or 'afhent' (order) | 'afhent' or 'dropoff' (return)
-      address: '', 
+      address: DEFAULT_CASES[0].address, 
       time: 'I morgen tidlig kl. 07:00',
       materials: '',
       estimatedVal: 3400,
