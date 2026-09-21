@@ -8,10 +8,10 @@
   <meta name="theme-color" content="#0f172a">
   <title>A/S Nortvig - Materialer, Retur & Kontrol</title>
 
-  <!-- Google Fonts: Plus Jakarta Sans -->
+  <!-- Google Fonts: Montserrat -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -20,7 +20,8 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Montserrat', 'sans-serif'],
+            sans: ['Montserrat', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            mono: ['Montserrat', 'monospace'],
           },
           colors: {
             nortvig: {
@@ -53,12 +54,17 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <style>
+    * {
+      font-family: 'Montserrat', sans-serif !important;
+    }
     body {
+      font-family: 'Montserrat', sans-serif;
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
     }
     input, textarea, select {
+      font-family: 'Montserrat', sans-serif;
       user-select: auto;
     }
     ::-webkit-scrollbar {
@@ -73,7 +79,7 @@
       border-radius: 9999px;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: #ea580c;
+      background: #00864E;
     }
     @keyframes pulse-ring {
       0% { transform: scale(0.95); opacity: 0.8; }
@@ -129,10 +135,10 @@
       <div class="flex items-center space-x-2">
         <!-- Mode Switch: Plads vs Admin Panel -->
         <button id="top-admin-toggle" onclick="toggleAdminView()" title="Skift til Projektleder & Admin Panel"
-          class="flex items-center space-x-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-bold active:scale-95 transition">
+          class="flex items-center space-x-1.5 bg-slate-800 hover:bg-slate-700 border border-[#52A633]/40 text-[#52A633] px-3 py-1.5 rounded-xl text-xs font-bold active:scale-95 transition">
           <i data-lucide="layout-dashboard" class="w-4 h-4 text-[#52A633]"></i>
           <span class="hidden sm:inline">Admin</span>
-          <span id="discrepancy-badge-header" class="px-1.5 py-0.2 rounded-full bg-red-600 text-white text-[10px] font-black">2</span>
+          <span id="discrepancy-badge-header" class="px-1.5 py-0.2 rounded-full bg-[#00864E] text-white text-[10px] font-black border border-[#52A633]/40">2</span>
         </button>
 
         <!-- 3-Way Match Shortcut Button -->
@@ -184,13 +190,13 @@
     <!-- Active Case/Supplier Subheader (visible in step 2, 3) -->
     <div id="active-summary-banner" class="hidden bg-slate-800/90 border-b border-slate-700/60 px-4 py-2 flex items-center justify-between text-xs">
       <div class="flex items-center space-x-2 overflow-hidden">
-        <span id="banner-action-type" class="px-2 py-0.5 rounded text-[10px] font-bold bg-[#00864E]/20 text-orange-300">BESTILLING</span>
+        <span id="banner-action-type" class="px-2 py-0.5 rounded text-[10px] font-bold bg-[#00864E]/20 text-[#52A633]">BESTILLING</span>
         <span class="text-slate-400">Sag:</span>
         <span id="banner-case-name" class="font-bold text-white truncate max-w-[140px]">Sag 2401</span>
         <span class="text-slate-500">|</span>
         <span id="banner-supplier-name" class="font-bold text-[#52A633] truncate">Vælg leverandør</span>
       </div>
-      <button onclick="resetFlowTo(1)" class="text-[#52A633] hover:text-orange-300 underline text-[11px] font-medium ml-2 shrink-0">
+      <button onclick="resetFlowTo(1)" class="text-[#52A633] hover:text-[#52A633]/80 underline text-[11px] font-medium ml-2 shrink-0">
         Skift
       </button>
     </div>
@@ -259,7 +265,7 @@
         <!-- Custom Case Fallback -->
         <div class="mt-4 p-4 rounded-2xl bg-slate-800/40 border border-dashed border-slate-700 text-center">
           <p class="text-xs text-slate-400">Mangler din sag på listen?</p>
-          <button onclick="promptManualCase()" class="mt-2 text-xs font-bold text-[#52A633] hover:text-orange-300 flex items-center justify-center space-x-1 mx-auto">
+          <button onclick="promptManualCase()" class="mt-2 text-xs font-bold text-[#52A633] hover:text-[#52A633]/80 flex items-center justify-center space-x-1 mx-auto">
             <i data-lucide="plus-circle" class="w-4 h-4"></i>
             <span>Indtast sagsnr. manuelt</span>
           </button>
@@ -497,7 +503,7 @@
               </button>
               
               <button type="button" onclick="setTimePreset('I morgen tidlig kl. 07:00')"
-                class="time-btn active border-2 border-[#52A633] bg-orange-950/30 p-2.5 rounded-xl text-left transition active:scale-95">
+                class="time-btn active border-2 border-[#52A633] bg-[#00864E]/15 p-2.5 rounded-xl text-left transition active:scale-95">
                 <div class="text-[10px] text-[#52A633] font-bold flex items-center">
                   <i data-lucide="sun" class="w-3 h-3 mr-1"></i> STANDARD
                 </div>
@@ -536,10 +542,10 @@
             </div>
 
             <!-- Live Speech Status Toast -->
-            <div id="voice-listening-toast" class="hidden p-2.5 bg-orange-950/60 border border-[#52A633]/50 rounded-xl flex items-center justify-between text-xs text-orange-200">
+            <div id="voice-listening-toast" class="hidden p-2.5 bg-[#00864E]/20 border border-[#52A633]/50 rounded-xl flex items-center justify-between text-xs text-emerald-200">
               <div class="flex items-center space-x-2">
                 <span class="w-3 h-3 rounded-full bg-red-500 recording-pulse"></span>
-                <span class="font-bold">Lytter... Tal naturligt på dansk!</span>
+                <span class="font-bold text-white">Lytter... Tal naturligt på dansk!</span>
               </div>
               <button type="button" onclick="stopVoiceDictation()" class="text-xs bg-[#00864E] px-2 py-0.5 rounded-md font-bold text-white">Færdig</button>
             </div>
@@ -928,7 +934,7 @@
           <!-- 6. THE BIG AMBER TOUCH-FRIENDLY CTA BUTTON -->
           <div class="pt-2">
             <button type="submit" id="submit-return-btn"
-              class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-amber-600 via-amber-500 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-black text-lg shadow-xl shadow-amber-950/60 border border-amber-400/40 flex items-center justify-center space-x-3 active:scale-[0.98] transition cursor-pointer">
+              class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-600 text-white font-black text-lg shadow-xl shadow-amber-950/60 border border-amber-400/40 flex items-center justify-center space-x-3 active:scale-[0.98] transition cursor-pointer">
               <i data-lucide="rotate-ccw" class="w-6 h-6"></i>
               <span class="tracking-wide">MELD RETURVARE NU</span>
             </button>
@@ -1030,7 +1036,7 @@
         <div class="space-y-2 pt-2">
           <!-- 3-Way Match Demonstration Button -->
           <button id="receipt-simulation-cta" onclick="openSimulationForCurrentOrder()"
-            class="w-full py-3.5 px-4 rounded-xl bg-[#00864E] hover:bg-[#52A633] text-white font-black text-sm flex items-center justify-center space-x-2 shadow-lg shadow-orange-950/50 active:scale-95 transition">
+            class="w-full py-3.5 px-4 rounded-xl bg-[#00864E] hover:bg-[#52A633] text-white font-black text-sm flex items-center justify-center space-x-2 shadow-lg shadow-emerald-950/50 active:scale-95 transition">
             <i data-lucide="shield-alert" class="w-4 h-4"></i>
             <span>Simuler Epikur 3-Vejs Match & Fakturakontrol</span>
           </button>
@@ -1385,7 +1391,7 @@
       <button onclick="toggleAdminView()" id="nav-btn-admin" class="flex flex-col items-center space-y-1 text-slate-400 hover:text-slate-200 font-semibold text-[11px] transition active:scale-95 relative">
         <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
         <span>Admin</span>
-        <span class="absolute -top-1 right-2 w-2 h-2 rounded-full bg-red-500"></span>
+        <span class="absolute -top-1 right-2 w-2 h-2 rounded-full bg-[#52A633]"></span>
       </button>
 
       <!-- 3-Way Match Shortcut -->
@@ -1556,7 +1562,7 @@
         headerTitle.textContent = 'Materialer & Plads';
         headerBadge.textContent = 'Lyn-Bestilling';
         bannerAction.textContent = 'BESTILLING';
-        bannerAction.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-[#00864E]/20 text-orange-300';
+        bannerAction.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-[#00864E]/20 text-[#52A633]';
 
         document.getElementById('flow-indicator-label').textContent = 'Ny Bestilling';
         document.getElementById('case-screen-title').textContent = 'Hvilken sag bestiller du til?';
@@ -1744,7 +1750,7 @@
             <div class="overflow-hidden">
               <div class="flex items-center space-x-2">
                 <span class="text-xs font-bold text-[#52A633]">${c.number}</span>
-                ${c.popular ? '<span class="bg-[#00864E]/20 text-orange-300 text-[10px] font-bold px-1.5 py-0.2 rounded">Aktiv</span>' : ''}
+                ${c.popular ? '<span class="bg-[#00864E]/20 text-[#52A633] text-[10px] font-bold px-1.5 py-0.2 rounded">Aktiv</span>' : ''}
               </div>
               <h4 class="text-base font-bold text-white group-hover:text-[#52A633] transition truncate">${c.name}</h4>
               <p class="text-xs text-slate-400 truncate flex items-center mt-0.5">
@@ -1904,7 +1910,7 @@
       document.querySelectorAll('.time-btn').forEach(btn => {
         btn.className = 'time-btn p-2.5 rounded-xl border border-slate-700 bg-slate-800/90 text-left hover:border-[#52A633] transition active:scale-95';
       });
-      event.currentTarget.className = 'time-btn active border-2 border-[#52A633] bg-orange-950/30 p-2.5 rounded-xl text-left transition active:scale-95';
+      event.currentTarget.className = 'time-btn active border-2 border-[#52A633] bg-[#00864E]/15 p-2.5 rounded-xl text-left transition active:scale-95';
       lucide.createIcons();
     }
 
@@ -2824,7 +2830,7 @@
                 <span>Epikur overvåger kreditnota</span>
               </span>
             ` : `
-              <button onclick="simulateThreeWayForOrder('${o.id}')" class="text-xs text-[#52A633] hover:text-orange-300 font-bold flex items-center space-x-1">
+              <button onclick="simulateThreeWayForOrder('${o.id}')" class="text-xs text-[#52A633] hover:text-[#52A633]/80 font-bold flex items-center space-x-1">
                 <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
                 <span>Se Epikur 3-vejs match</span>
               </button>
