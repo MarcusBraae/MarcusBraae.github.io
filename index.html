@@ -11,7 +11,7 @@
   <!-- Google Fonts: Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -20,19 +20,26 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            sans: ['Montserrat', 'sans-serif'],
           },
           colors: {
             nortvig: {
-              50: '#fff7ed',
-              100: '#ffedd5',
-              400: '#fb923c',
-              500: '#f97316',
-              600: '#ea580c',
-              700: '#c2410c',
-              dark: '#0f172a',
-              card: '#1e293b',
-              border: '#334155'
+              green: '#52A633',
+              darkgreen: '#00864E',
+              forest: '#004629',
+              night: '#00311D',
+              anthracite: '#3C3C3B',
+              lightgray: '#F6F6F6',
+              linegray: '#E3E3E3',
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              400: '#52A633',
+              500: '#00864E',
+              600: '#004629',
+              700: '#00311D',
+              dark: '#00311D',
+              card: '#004629',
+              border: '#00864E'
             }
           }
         }
@@ -100,12 +107,18 @@
     <!-- Top Status / Branding Bar -->
     <header class="bg-slate-900/95 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40 px-4 py-3.5 flex items-center justify-between">
       <div class="flex items-center space-x-3 cursor-pointer" onclick="setAppMode('order')">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-700 flex items-center justify-center font-black text-white text-xl shadow-lg shadow-orange-600/30 tracking-tight">
-          N
+        <div class="p-1.5 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center shadow-lg">
+          <svg width="32" height="20" viewBox="0 0 80 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M38.1306 0.602417L26.8736 18.3735L33.1142 28.4036L35.085 31.5964L46.3719 13.7952L38.1306 0.602417Z" fill="#52A633"/>
+            <path d="M15.4075 0L26.5153 17.8313L30.9942 10.7831L37.6828 0H15.4075Z" fill="#52A633"/>
+            <path d="M35.4433 32.1385L46.5809 50L57.8379 32.2289L46.7003 14.3675L35.4433 32.1385Z" fill="#52A633"/>
+            <path d="M55.8075 0L49.1488 10.512L47.0587 13.8253L58.1963 31.7169L79.1278 0H55.8075Z" fill="#52A633"/>
+            <path d="M15.0194 0.481934L0 24.6687H22.1558L26.157 18.3735L15.0194 0.481934Z" fill="#00864E"/>
+          </svg>
         </div>
         <div>
           <div class="flex items-center space-x-2">
-            <span class="text-xs font-bold uppercase tracking-wider text-orange-400">A/S Nortvig</span>
+            <span class="text-xs font-bold uppercase tracking-wider text-[#52A633]">A/S Nortvig</span>
             <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
             <span id="header-mode-badge" class="text-[10px] text-slate-400 font-medium">Pladsportal</span>
           </div>
@@ -117,15 +130,15 @@
         <!-- Mode Switch: Plads vs Admin Panel -->
         <button id="top-admin-toggle" onclick="toggleAdminView()" title="Skift til Projektleder & Admin Panel"
           class="flex items-center space-x-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-bold active:scale-95 transition">
-          <i data-lucide="layout-dashboard" class="w-4 h-4 text-orange-400"></i>
+          <i data-lucide="layout-dashboard" class="w-4 h-4 text-[#52A633]"></i>
           <span class="hidden sm:inline">Admin</span>
           <span id="discrepancy-badge-header" class="px-1.5 py-0.2 rounded-full bg-red-600 text-white text-[10px] font-black">2</span>
         </button>
 
         <!-- 3-Way Match Shortcut Button -->
         <button onclick="toggleThreeWayModal(true)" title="Åbn Epikur 3-vejs Match simulation"
-          class="hidden xs:flex items-center space-x-1 bg-slate-800 hover:bg-slate-700 border border-orange-500/40 text-orange-400 px-2.5 py-1.5 rounded-xl text-xs font-semibold active:scale-95 transition">
-          <i data-lucide="shield-check" class="w-4 h-4 text-orange-400"></i>
+          class="hidden xs:flex items-center space-x-1 bg-slate-800 hover:bg-slate-700 border border-[#52A633]/40 text-[#52A633] px-2.5 py-1.5 rounded-xl text-xs font-semibold active:scale-95 transition">
+          <i data-lucide="shield-check" class="w-4 h-4 text-[#52A633]"></i>
           <span class="hidden sm:inline">Match</span>
         </button>
 
@@ -133,7 +146,7 @@
         <button onclick="switchScreen('screen-history')" title="Se historik"
           class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 active:scale-95 transition relative">
           <i data-lucide="clock" class="w-4 h-4"></i>
-          <span id="order-badge" class="hidden absolute -top-1 -right-1 w-4 h-4 bg-orange-500 text-[10px] font-bold text-white rounded-full flex items-center justify-center">0</span>
+          <span id="order-badge" class="hidden absolute -top-1 -right-1 w-4 h-4 bg-[#52A633] text-[10px] font-bold text-white rounded-full flex items-center justify-center">0</span>
         </button>
       </div>
     </header>
@@ -143,7 +156,7 @@
       <div class="grid grid-cols-2 gap-1.5 w-full bg-slate-900 p-1 rounded-2xl border border-slate-800">
         <!-- Order Mode Button -->
         <button id="mode-btn-order" onclick="setAppMode('order')"
-          class="flex items-center justify-center space-x-2 py-2.5 px-3 rounded-xl font-bold text-xs transition bg-orange-600 text-white shadow-md">
+          class="flex items-center justify-center space-x-2 py-2.5 px-3 rounded-xl font-bold text-xs transition bg-[#00864E] text-white shadow-md">
           <i data-lucide="shopping-cart" class="w-4 h-4"></i>
           <span>Ny Bestilling</span>
         </button>
@@ -161,7 +174,7 @@
     <!-- Progress Indicator Bar (For Wizard steps) -->
     <div id="progress-bar-wrapper" class="bg-slate-900 px-4 py-2 border-b border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
       <div class="flex items-center space-x-2 w-full">
-        <div id="step-dot-1" class="flex-1 h-1.5 rounded-full bg-orange-500 transition-all duration-300"></div>
+        <div id="step-dot-1" class="flex-1 h-1.5 rounded-full bg-[#52A633] transition-all duration-300"></div>
         <div id="step-dot-2" class="flex-1 h-1.5 rounded-full bg-slate-700 transition-all duration-300"></div>
         <div id="step-dot-3" class="flex-1 h-1.5 rounded-full bg-slate-700 transition-all duration-300"></div>
         <div id="step-dot-4" class="flex-1 h-1.5 rounded-full bg-slate-700 transition-all duration-300"></div>
@@ -171,13 +184,13 @@
     <!-- Active Case/Supplier Subheader (visible in step 2, 3) -->
     <div id="active-summary-banner" class="hidden bg-slate-800/90 border-b border-slate-700/60 px-4 py-2 flex items-center justify-between text-xs">
       <div class="flex items-center space-x-2 overflow-hidden">
-        <span id="banner-action-type" class="px-2 py-0.5 rounded text-[10px] font-bold bg-orange-500/20 text-orange-300">BESTILLING</span>
+        <span id="banner-action-type" class="px-2 py-0.5 rounded text-[10px] font-bold bg-[#00864E]/20 text-orange-300">BESTILLING</span>
         <span class="text-slate-400">Sag:</span>
         <span id="banner-case-name" class="font-bold text-white truncate max-w-[140px]">Sag 2401</span>
         <span class="text-slate-500">|</span>
-        <span id="banner-supplier-name" class="font-bold text-orange-400 truncate">Vælg leverandør</span>
+        <span id="banner-supplier-name" class="font-bold text-[#52A633] truncate">Vælg leverandør</span>
       </div>
-      <button onclick="resetFlowTo(1)" class="text-orange-400 hover:text-orange-300 underline text-[11px] font-medium ml-2 shrink-0">
+      <button onclick="resetFlowTo(1)" class="text-[#52A633] hover:text-orange-300 underline text-[11px] font-medium ml-2 shrink-0">
         Skift
       </button>
     </div>
@@ -205,11 +218,11 @@
       <section id="screen-case" class="flex-col space-y-4 flex">
         <div class="pt-1">
           <div class="flex items-center justify-between mb-2">
-            <span id="step1-badge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-orange-500/10 text-orange-400 border border-orange-500/20">
+            <span id="step1-badge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#52A633]/10 text-[#52A633] border border-[#52A633]/20">
               Trin 1 af 3
             </span>
             <div id="flow-indicator-tag" class="text-xs font-bold text-slate-400 flex items-center space-x-1">
-              <i data-lucide="shopping-bag" class="w-3.5 h-3.5 text-orange-400"></i>
+              <i data-lucide="shopping-bag" class="w-3.5 h-3.5 text-[#52A633]"></i>
               <span id="flow-indicator-label">Ny Bestilling</span>
             </div>
           </div>
@@ -223,7 +236,7 @@
             <i data-lucide="search" class="w-5 h-5"></i>
           </div>
           <input type="text" id="case-search-input" oninput="filterCases()" placeholder="Søg sagsnr., by eller pladsnavn..."
-            class="w-full pl-11 pr-10 py-3.5 bg-slate-800/90 border-2 border-slate-700 focus:border-orange-500 rounded-2xl text-white placeholder-slate-400 text-base font-medium shadow-inner focus:outline-none transition">
+            class="w-full pl-11 pr-10 py-3.5 bg-slate-800/90 border-2 border-slate-700 focus:border-[#52A633] rounded-2xl text-white placeholder-slate-400 text-base font-medium shadow-inner focus:outline-none transition">
           <button id="case-search-clear" onclick="clearCaseSearch()" class="hidden absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white">
             <i data-lucide="x" class="w-4 h-4"></i>
           </button>
@@ -232,7 +245,7 @@
         <!-- Quick filter chips -->
         <div class="flex items-center space-x-2 overflow-x-auto pb-1 text-xs no-scrollbar">
           <span class="text-slate-500 shrink-0 font-medium">Hurtig:</span>
-          <button onclick="quickFilterCases('alle')" class="chip-filter active px-3 py-1.5 rounded-xl bg-orange-600 text-white font-bold shrink-0 transition">Alle sager</button>
+          <button onclick="quickFilterCases('alle')" class="chip-filter active px-3 py-1.5 rounded-xl bg-[#00864E] text-white font-bold shrink-0 transition">Alle sager</button>
           <button onclick="quickFilterCases('Aarhus')" class="chip-filter px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold shrink-0 border border-slate-700">Aarhus</button>
           <button onclick="quickFilterCases('Erhverv')" class="chip-filter px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold shrink-0 border border-slate-700">Erhverv</button>
           <button onclick="quickFilterCases('Bolig')" class="chip-filter px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold shrink-0 border border-slate-700">Bolig</button>
@@ -246,7 +259,7 @@
         <!-- Custom Case Fallback -->
         <div class="mt-4 p-4 rounded-2xl bg-slate-800/40 border border-dashed border-slate-700 text-center">
           <p class="text-xs text-slate-400">Mangler din sag på listen?</p>
-          <button onclick="promptManualCase()" class="mt-2 text-xs font-bold text-orange-400 hover:text-orange-300 flex items-center justify-center space-x-1 mx-auto">
+          <button onclick="promptManualCase()" class="mt-2 text-xs font-bold text-[#52A633] hover:text-orange-300 flex items-center justify-center space-x-1 mx-auto">
             <i data-lucide="plus-circle" class="w-4 h-4"></i>
             <span>Indtast sagsnr. manuelt</span>
           </button>
@@ -259,7 +272,7 @@
       <section id="screen-supplier" class="hidden flex-col space-y-4">
         <div class="flex items-center justify-between pt-1">
           <div>
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-orange-500/10 text-orange-400 border border-orange-500/20 mb-2">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#52A633]/10 text-[#52A633] border border-[#52A633]/20 mb-2">
               Trin 2 af 3
             </span>
             <h2 id="supplier-screen-title" class="text-2xl font-black text-white tracking-tight">Hvilken leverandør?</h2>
@@ -273,7 +286,7 @@
         <!-- Selected Case Pill -->
         <div class="p-3 bg-slate-800/80 border border-slate-700 rounded-xl flex items-center justify-between">
           <div class="flex items-center space-x-3">
-            <div class="w-8 h-8 rounded-lg bg-orange-500/20 text-orange-400 flex items-center justify-center font-bold text-sm">
+            <div class="w-8 h-8 rounded-lg bg-[#00864E]/20 text-[#52A633] flex items-center justify-center font-bold text-sm">
               <i data-lucide="map-pin" class="w-4 h-4"></i>
             </div>
             <div>
@@ -281,7 +294,7 @@
               <div id="supplier-screen-case-info" class="text-sm font-bold text-white">Sag 2401 - Risskov Strandvej</div>
             </div>
           </div>
-          <button onclick="switchScreen('screen-case')" class="text-xs text-orange-400 font-semibold hover:underline">Skift</button>
+          <button onclick="switchScreen('screen-case')" class="text-xs text-[#52A633] font-semibold hover:underline">Skift</button>
         </div>
 
         <!-- 4 Big Distinct Supplier Cards -->
@@ -316,7 +329,7 @@
           <!-- STARK -->
           <button onclick="selectSupplier('STARK', 'stark@nortvig-ordrer.dk', 'Byggematerialer, værktøj & beklædning')"
             class="supplier-card group text-left p-4 rounded-2xl bg-gradient-to-r from-slate-800 to-slate-800/90 border-2 border-slate-700 hover:border-amber-500 active:scale-[0.98] transition shadow-lg relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-24 h-24 bg-orange-600/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+            <div class="absolute top-0 right-0 w-24 h-24 bg-[#00864E]/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
             <div class="flex items-start justify-between">
               <div class="flex items-center space-x-3.5">
                 <div class="w-14 h-14 rounded-2xl bg-amber-500 flex items-center justify-center font-black text-slate-950 text-xl shadow-md tracking-wider">
@@ -380,7 +393,7 @@
                     <h3 class="text-xl font-black text-white group-hover:text-red-400 transition">WÜRTH</h3>
                     <span class="bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider">Fast Aftale</span>
                   </div>
-                  <p class="text-xs font-bold text-orange-400 mt-1">Fast leverandør af skruer & befæstigelse</p>
+                  <p class="text-xs font-bold text-[#52A633] mt-1">Fast leverandør af skruer & befæstigelse</p>
                   <p class="text-[11px] text-slate-300 mt-0.5">
                     Beslag, montageskruer, lim, fuge, kemi & bor
                   </p>
@@ -416,7 +429,7 @@
         <!-- Order Context Header (Sag + Leverandør badge) -->
         <div class="grid grid-cols-2 gap-2 bg-slate-800/90 p-3 rounded-2xl border border-slate-700">
           <div class="flex items-center space-x-2.5 border-r border-slate-700/80 pr-2">
-            <div class="w-8 h-8 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center shrink-0">
+            <div class="w-8 h-8 rounded-xl bg-[#00864E]/20 text-[#52A633] flex items-center justify-center shrink-0">
               <i data-lucide="folder" class="w-4 h-4"></i>
             </div>
             <div class="overflow-hidden">
@@ -443,7 +456,7 @@
             <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">Leveringsmetode</label>
             <div class="grid grid-cols-2 gap-2 p-1 bg-slate-950 rounded-2xl border border-slate-800">
               <button type="button" id="btn-type-delivery" onclick="setDeliveryType('plads')"
-                class="flex items-center justify-center space-x-2 py-3 px-3 rounded-xl font-bold text-xs transition bg-orange-600 text-white shadow-md">
+                class="flex items-center justify-center space-x-2 py-3 px-3 rounded-xl font-bold text-xs transition bg-[#00864E] text-white shadow-md">
                 <i data-lucide="truck" class="w-4 h-4"></i>
                 <span>Leveres på byggeplads</span>
               </button>
@@ -459,14 +472,14 @@
           <div id="delivery-address-group" class="space-y-1.5">
             <div class="flex items-center justify-between">
               <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">Leveringsadresse / Aflæsningssted</label>
-              <span class="text-[11px] text-orange-400 font-medium">Hentet fra sag</span>
+              <span class="text-[11px] text-[#52A633] font-medium">Hentet fra sag</span>
             </div>
             <div class="relative">
               <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                 <i data-lucide="map-pin" class="w-4 h-4"></i>
               </div>
               <input type="text" id="order-address" required
-                class="w-full pl-10 pr-4 py-3 bg-slate-800/90 border border-slate-700 focus:border-orange-500 rounded-xl text-white text-sm font-medium focus:outline-none transition"
+                class="w-full pl-10 pr-4 py-3 bg-slate-800/90 border border-slate-700 focus:border-[#52A633] rounded-xl text-white text-sm font-medium focus:outline-none transition"
                 value="Risskov Strandvej 42, 8240 Risskov (Varemodtagelse ved skurvogn)">
             </div>
           </div>
@@ -476,7 +489,7 @@
             <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">Hvornår skal det være klar?</label>
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
               <button type="button" onclick="setTimePreset('Hurtigst muligt (Strakshold)')"
-                class="time-btn p-2.5 rounded-xl border border-slate-700 bg-slate-800/90 text-left hover:border-orange-500 transition active:scale-95">
+                class="time-btn p-2.5 rounded-xl border border-slate-700 bg-slate-800/90 text-left hover:border-[#52A633] transition active:scale-95">
                 <div class="text-[10px] text-red-400 font-bold flex items-center">
                   <i data-lucide="zap" class="w-3 h-3 mr-1"></i> STRAKS
                 </div>
@@ -484,15 +497,15 @@
               </button>
               
               <button type="button" onclick="setTimePreset('I morgen tidlig kl. 07:00')"
-                class="time-btn active border-2 border-orange-500 bg-orange-950/30 p-2.5 rounded-xl text-left transition active:scale-95">
-                <div class="text-[10px] text-orange-400 font-bold flex items-center">
+                class="time-btn active border-2 border-[#52A633] bg-orange-950/30 p-2.5 rounded-xl text-left transition active:scale-95">
+                <div class="text-[10px] text-[#52A633] font-bold flex items-center">
                   <i data-lucide="sun" class="w-3 h-3 mr-1"></i> STANDARD
                 </div>
                 <div class="text-xs font-extrabold text-white mt-0.5">I morgen kl. 07:00</div>
               </button>
 
               <button type="button" onclick="setTimePreset('I dag kl. 12:00')"
-                class="time-btn p-2.5 rounded-xl border border-slate-700 bg-slate-800/90 text-left hover:border-orange-500 transition active:scale-95">
+                class="time-btn p-2.5 rounded-xl border border-slate-700 bg-slate-800/90 text-left hover:border-[#52A633] transition active:scale-95">
                 <div class="text-[10px] text-slate-400 font-bold flex items-center">
                   <i data-lucide="clock" class="w-3 h-3 mr-1"></i> MIDDAG
                 </div>
@@ -503,7 +516,7 @@
             <!-- Valgt tidspunkt input felt -->
             <input type="text" id="order-time-custom" required
               value="I morgen tidlig kl. 07:00"
-              class="mt-2 w-full px-3.5 py-2.5 bg-slate-800/60 border border-slate-700/80 rounded-xl text-xs text-slate-200 focus:border-orange-500 focus:outline-none">
+              class="mt-2 w-full px-3.5 py-2.5 bg-slate-800/60 border border-slate-700/80 rounded-xl text-xs text-slate-200 focus:border-[#52A633] focus:outline-none">
           </div>
 
           <!-- 4. MATERIALETEKSTFELT MED TALEGENKENDELSE & HURTIG-TAGS -->
@@ -515,27 +528,27 @@
               
               <!-- Voice Dictation Button -->
               <button type="button" id="voice-record-btn" onclick="toggleVoiceDictation('order')"
-                class="flex items-center space-x-1.5 px-3 py-1 rounded-xl bg-orange-600/20 hover:bg-orange-600/30 border border-orange-500/40 text-orange-400 text-xs font-bold active:scale-95 transition">
-                <div id="mic-pulse-indicator" class="w-2 h-2 rounded-full bg-orange-500"></div>
+                class="flex items-center space-x-1.5 px-3 py-1 rounded-xl bg-[#00864E]/20 hover:bg-[#00864E]/30 border border-[#52A633]/40 text-[#52A633] text-xs font-bold active:scale-95 transition">
+                <div id="mic-pulse-indicator" class="w-2 h-2 rounded-full bg-[#52A633]"></div>
                 <i data-lucide="mic" class="w-3.5 h-3.5"></i>
                 <span id="voice-btn-label">Tryk og tal</span>
               </button>
             </div>
 
             <!-- Live Speech Status Toast -->
-            <div id="voice-listening-toast" class="hidden p-2.5 bg-orange-950/60 border border-orange-500/50 rounded-xl flex items-center justify-between text-xs text-orange-200">
+            <div id="voice-listening-toast" class="hidden p-2.5 bg-orange-950/60 border border-[#52A633]/50 rounded-xl flex items-center justify-between text-xs text-orange-200">
               <div class="flex items-center space-x-2">
                 <span class="w-3 h-3 rounded-full bg-red-500 recording-pulse"></span>
                 <span class="font-bold">Lytter... Tal naturligt på dansk!</span>
               </div>
-              <button type="button" onclick="stopVoiceDictation()" class="text-xs bg-orange-600 px-2 py-0.5 rounded-md font-bold text-white">Færdig</button>
+              <button type="button" onclick="stopVoiceDictation()" class="text-xs bg-[#00864E] px-2 py-0.5 rounded-md font-bold text-white">Færdig</button>
             </div>
 
             <!-- The Big Material Textarea -->
             <div class="relative">
               <textarea id="order-materials" rows="5"
                 placeholder="Skriv, indtal eller vedhæft Excel/materialeliste nedenfor... F.eks.:&#10;• 10 pk Würth 4,5x60 terrasseskruer&#10;• 15 stk 45x95 reglar à 4,2 meter&#10;• 2 ruller dampspærre 0,20mm&#10;• Eller vedhæft 'Spær & Træliste.xlsx' direkte"
-                class="w-full p-3.5 bg-slate-800/95 border-2 border-slate-700 focus:border-orange-500 rounded-2xl text-white placeholder-slate-500 text-sm font-medium focus:outline-none transition leading-relaxed"></textarea>
+                class="w-full p-3.5 bg-slate-800/95 border-2 border-slate-700 focus:border-[#52A633] rounded-2xl text-white placeholder-slate-500 text-sm font-medium focus:outline-none transition leading-relaxed"></textarea>
             </div>
 
             <!-- Quick Template Chips (1-click insert) -->
@@ -614,7 +627,7 @@
               <button type="button" onclick="document.getElementById('order-photo-camera-input').click()"
                 class="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-semibold flex items-center space-x-1.5 active:scale-95 transition"
                 title="Tag billede af seddel">
-                <i data-lucide="camera" class="w-3.5 h-3.5 text-orange-400"></i>
+                <i data-lucide="camera" class="w-3.5 h-3.5 text-[#52A633]"></i>
                 <span class="hidden xs:inline">Kamera</span>
               </button>
               <input type="file" id="order-photo-camera-input" accept="image/*" capture="environment" onchange="handleCameraPhotoUpload(event)" class="hidden">
@@ -667,13 +680,13 @@
               <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Bestiller (Navn)</label>
               <input type="text" id="order-sender" required
                 value="Marcus Dalland Braae"
-                class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:border-orange-500 focus:outline-none">
+                class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:border-[#52A633] focus:outline-none">
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Mobilnr. på pladsen</label>
               <input type="tel" id="order-phone" required
                 value="+45 22 88 14 00"
-                class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:border-orange-500 focus:outline-none">
+                class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:border-[#52A633] focus:outline-none">
             </div>
           </div>
 
@@ -681,7 +694,7 @@
             <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Bemærkning til chauffør / lager</label>
             <input type="text" id="order-note"
               placeholder="F.eks.: Ring 15 min før ankomst, kranbil påkrævet..."
-              class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:border-orange-500 focus:outline-none">
+              class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:border-[#52A633] focus:outline-none">
           </div>
 
           <!-- 7. THE BIG GREEN TOUCH-FRIENDLY CTA BUTTON -->
@@ -941,7 +954,7 @@
             BESTILLING GENNEMFØRT
           </div>
           <h2 id="receipt-header-title" class="text-2xl font-black text-white">Ordrereference</h2>
-          <div id="receipt-order-id" class="text-2xl font-mono font-black text-orange-400 mt-1 tracking-wider select-all">
+          <div id="receipt-order-id" class="text-2xl font-mono font-black text-[#52A633] mt-1 tracking-wider select-all">
             NTV-2026-8492
           </div>
         </div>
@@ -989,7 +1002,7 @@
           </div>
           <div class="flex justify-between items-center pb-2 border-b border-slate-700/60">
             <span class="text-slate-400">Leverandør:</span>
-            <span id="receipt-supplier" class="font-bold text-orange-400">Bygma</span>
+            <span id="receipt-supplier" class="font-bold text-[#52A633]">Bygma</span>
           </div>
           <div class="flex justify-between items-center pb-2 border-b border-slate-700/60">
             <span id="receipt-detail-type-label" class="text-slate-400">Levering:</span>
@@ -1017,7 +1030,7 @@
         <div class="space-y-2 pt-2">
           <!-- 3-Way Match Demonstration Button -->
           <button id="receipt-simulation-cta" onclick="openSimulationForCurrentOrder()"
-            class="w-full py-3.5 px-4 rounded-xl bg-orange-600 hover:bg-orange-500 text-white font-black text-sm flex items-center justify-center space-x-2 shadow-lg shadow-orange-950/50 active:scale-95 transition">
+            class="w-full py-3.5 px-4 rounded-xl bg-[#00864E] hover:bg-[#52A633] text-white font-black text-sm flex items-center justify-center space-x-2 shadow-lg shadow-orange-950/50 active:scale-95 transition">
             <i data-lucide="shield-alert" class="w-4 h-4"></i>
             <span>Simuler Epikur 3-Vejs Match & Fakturakontrol</span>
           </button>
@@ -1055,7 +1068,7 @@
 
         <!-- Filter tabs for history -->
         <div class="flex space-x-2 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-bold">
-          <button id="hist-tab-all" onclick="filterHistoryDisplay('all')" class="flex-1 py-1.5 rounded-lg bg-orange-600 text-white transition">Alle</button>
+          <button id="hist-tab-all" onclick="filterHistoryDisplay('all')" class="flex-1 py-1.5 rounded-lg bg-[#00864E] text-white transition">Alle</button>
           <button id="hist-tab-orders" onclick="filterHistoryDisplay('orders')" class="flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white transition">Bestillinger</button>
           <button id="hist-tab-returns" onclick="filterHistoryDisplay('returns')" class="flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white transition">Returvarer</button>
         </div>
@@ -1074,7 +1087,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1 border-b border-slate-800 pb-4">
           <div>
             <div class="flex items-center space-x-2 mb-1">
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-black bg-orange-500/20 text-orange-400 border border-orange-500/30">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-black bg-[#00864E]/20 text-[#52A633] border border-[#52A633]/30">
                 PROJEKTLEDER & KONTORVISNING
               </span>
               <span class="text-xs text-slate-400 font-medium">Marcus Dalland Braae</span>
@@ -1085,10 +1098,10 @@
 
           <div class="flex items-center space-x-2">
             <button onclick="refreshAdminData()" class="flex items-center space-x-1.5 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold border border-slate-700 active:scale-95 transition">
-              <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-orange-400"></i>
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-[#52A633]"></i>
               <span>Synkronisér E-komplet</span>
             </button>
-            <button onclick="setAppMode('order')" class="flex items-center space-x-1.5 px-3 py-2 bg-orange-600 hover:bg-orange-500 text-white rounded-xl text-xs font-bold shadow-md active:scale-95 transition">
+            <button onclick="setAppMode('order')" class="flex items-center space-x-1.5 px-3 py-2 bg-[#00864E] hover:bg-[#52A633] text-white rounded-xl text-xs font-bold shadow-md active:scale-95 transition">
               <i data-lucide="smartphone" class="w-3.5 h-3.5"></i>
               <span>Tilbage til Plads</span>
             </button>
@@ -1208,7 +1221,7 @@
         <!-- Modal Header -->
         <div class="p-4 border-b border-slate-800 bg-slate-850 flex items-center justify-between">
           <div class="flex items-center space-x-2.5">
-            <div class="w-9 h-9 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center border border-orange-500/30">
+            <div class="w-9 h-9 rounded-xl bg-[#00864E]/20 text-[#52A633] flex items-center justify-center border border-[#52A633]/30">
               <i data-lucide="cpu" class="w-5 h-5"></i>
             </div>
             <div>
@@ -1242,7 +1255,7 @@
           <!-- Pillar 1: App Bestilling (Indkøbsrekvisition) -->
           <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700 space-y-1.5">
             <div class="flex items-center justify-between">
-              <span class="font-bold text-orange-400 flex items-center space-x-1.5">
+              <span class="font-bold text-[#52A633] flex items-center space-x-1.5">
                 <i data-lucide="smartphone" class="w-3.5 h-3.5"></i>
                 <span>1. Mobil App Bestilling (Nortvig Rekvisition)</span>
               </span>
@@ -1357,7 +1370,7 @@
     <nav class="bg-slate-900/95 backdrop-blur-md border-t border-slate-800 px-4 sm:px-6 py-2.5 flex items-center justify-around fixed sm:absolute bottom-0 inset-x-0 z-30">
       
       <!-- Order / Plads Tab -->
-      <button onclick="setAppMode('order')" id="nav-btn-order" class="flex flex-col items-center space-y-1 text-orange-500 font-bold text-[11px] transition active:scale-95">
+      <button onclick="setAppMode('order')" id="nav-btn-order" class="flex flex-col items-center space-y-1 text-[#00864E] font-bold text-[11px] transition active:scale-95">
         <i data-lucide="shopping-cart" class="w-5 h-5"></i>
         <span>Bestil</span>
       </button>
@@ -1537,21 +1550,21 @@
       document.getElementById('progress-bar-wrapper').classList.remove('hidden');
 
       if (mode === 'order') {
-        btnOrder.className = 'flex items-center justify-center space-x-2 py-2.5 px-3 rounded-xl font-bold text-xs transition bg-orange-600 text-white shadow-md';
+        btnOrder.className = 'flex items-center justify-center space-x-2 py-2.5 px-3 rounded-xl font-bold text-xs transition bg-[#00864E] text-white shadow-md';
         btnReturn.className = 'flex items-center justify-center space-x-2 py-2.5 px-3 rounded-xl font-bold text-xs transition text-slate-400 hover:text-white';
         
         headerTitle.textContent = 'Materialer & Plads';
         headerBadge.textContent = 'Lyn-Bestilling';
         bannerAction.textContent = 'BESTILLING';
-        bannerAction.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-orange-500/20 text-orange-300';
+        bannerAction.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-[#00864E]/20 text-orange-300';
 
         document.getElementById('flow-indicator-label').textContent = 'Ny Bestilling';
         document.getElementById('case-screen-title').textContent = 'Hvilken sag bestiller du til?';
         document.getElementById('case-screen-subtitle').textContent = 'Vælg fra dine aktive byggepladser eller søg sagsnr.';
 
-        navOrder.classList.replace('text-slate-400', 'text-orange-500');
+        navOrder.classList.replace('text-slate-400', 'text-[#00864E]');
         navReturn.classList.replace('text-amber-500', 'text-slate-400');
-        navAdmin.classList.replace('text-orange-400', 'text-slate-400');
+        navAdmin.classList.replace('text-[#52A633]', 'text-slate-400');
 
       } else {
         // Return mode
@@ -1568,8 +1581,8 @@
         document.getElementById('case-screen-subtitle').textContent = 'Vælg pladsen hvor de ubrugte materialer befinder sig';
 
         navReturn.classList.replace('text-slate-400', 'text-amber-500');
-        navOrder.classList.replace('text-orange-500', 'text-slate-400');
-        navAdmin.classList.replace('text-orange-400', 'text-slate-400');
+        navOrder.classList.replace('text-[#00864E]', 'text-slate-400');
+        navAdmin.classList.replace('text-[#52A633]', 'text-slate-400');
       }
 
       switchScreen('screen-case');
@@ -1649,7 +1662,7 @@
       };
 
       resetDots();
-      const activeColor = (appMode === 'return') ? 'bg-amber-500' : 'bg-orange-500';
+      const activeColor = (appMode === 'return') ? 'bg-amber-500' : 'bg-[#52A633]';
 
       if (screenId === 'screen-case') {
         dot1.className = `flex-1 h-1.5 rounded-full ${activeColor} transition-all duration-300`;
@@ -1680,13 +1693,13 @@
       });
 
       if (screenId === 'screen-admin') {
-        navAdmin.className = 'flex flex-col items-center space-y-1 text-orange-400 font-bold text-[11px] transition active:scale-95 relative';
+        navAdmin.className = 'flex flex-col items-center space-y-1 text-[#52A633] font-bold text-[11px] transition active:scale-95 relative';
       } else if (screenId === 'screen-history') {
-        navHistory.className = 'flex flex-col items-center space-y-1 text-orange-500 font-bold text-[11px] transition active:scale-95';
+        navHistory.className = 'flex flex-col items-center space-y-1 text-[#00864E] font-bold text-[11px] transition active:scale-95';
       } else if (appMode === 'return') {
         navReturn.className = 'flex flex-col items-center space-y-1 text-amber-500 font-bold text-[11px] transition active:scale-95';
       } else {
-        navOrder.className = 'flex flex-col items-center space-y-1 text-orange-500 font-bold text-[11px] transition active:scale-95';
+        navOrder.className = 'flex flex-col items-center space-y-1 text-[#00864E] font-bold text-[11px] transition active:scale-95';
       }
     }
 
@@ -1718,22 +1731,22 @@
         const card = document.createElement('button');
         card.className = `w-full text-left p-3.5 rounded-2xl border-2 transition active:scale-[0.98] flex items-center justify-between group ${
           isSelected 
-            ? 'bg-slate-800 border-orange-500 shadow-md' 
+            ? 'bg-slate-800 border-[#52A633] shadow-md' 
             : 'bg-slate-800/80 hover:bg-slate-800 border-slate-700/80 hover:border-slate-600'
         }`;
         card.onclick = () => selectCase(c);
 
         card.innerHTML = `
           <div class="flex items-start space-x-3 overflow-hidden">
-            <div class="w-11 h-11 rounded-xl ${isSelected ? 'bg-orange-600 text-white' : 'bg-slate-700/60 text-orange-400'} flex flex-col items-center justify-center shrink-0 font-extrabold text-xs">
+            <div class="w-11 h-11 rounded-xl ${isSelected ? 'bg-[#00864E] text-white' : 'bg-slate-700/60 text-[#52A633]'} flex flex-col items-center justify-center shrink-0 font-extrabold text-xs">
               <span>${c.id}</span>
             </div>
             <div class="overflow-hidden">
               <div class="flex items-center space-x-2">
-                <span class="text-xs font-bold text-orange-400">${c.number}</span>
-                ${c.popular ? '<span class="bg-orange-500/20 text-orange-300 text-[10px] font-bold px-1.5 py-0.2 rounded">Aktiv</span>' : ''}
+                <span class="text-xs font-bold text-[#52A633]">${c.number}</span>
+                ${c.popular ? '<span class="bg-[#00864E]/20 text-orange-300 text-[10px] font-bold px-1.5 py-0.2 rounded">Aktiv</span>' : ''}
               </div>
-              <h4 class="text-base font-bold text-white group-hover:text-orange-400 transition truncate">${c.name}</h4>
+              <h4 class="text-base font-bold text-white group-hover:text-[#52A633] transition truncate">${c.name}</h4>
               <p class="text-xs text-slate-400 truncate flex items-center mt-0.5">
                 <i data-lucide="map-pin" class="w-3 h-3 mr-1 text-slate-500 shrink-0"></i>
                 <span class="truncate">${c.address}</span>
@@ -1741,7 +1754,7 @@
             </div>
           </div>
           <div class="ml-2 shrink-0">
-            <div class="w-7 h-7 rounded-full bg-slate-700/50 flex items-center justify-center text-slate-400 group-hover:bg-orange-500 group-hover:text-white transition">
+            <div class="w-7 h-7 rounded-full bg-slate-700/50 flex items-center justify-center text-slate-400 group-hover:bg-[#52A633] group-hover:text-white transition">
               <i data-lucide="chevron-right" class="w-4 h-4"></i>
             </div>
           </div>
@@ -1799,7 +1812,7 @@
       document.querySelectorAll('.chip-filter').forEach(chip => {
         chip.className = 'chip-filter px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold shrink-0 border border-slate-700';
       });
-      event.target.className = 'chip-filter active px-3 py-1.5 rounded-xl bg-orange-600 text-white font-bold shrink-0 transition';
+      event.target.className = 'chip-filter active px-3 py-1.5 rounded-xl bg-[#00864E] text-white font-bold shrink-0 transition';
       filterCases();
     }
 
@@ -1872,12 +1885,12 @@
       const addrInput = document.getElementById('order-address');
 
       if (type === 'plads') {
-        btnDelivery.className = 'flex items-center justify-center space-x-2 py-3 px-3 rounded-xl font-bold text-xs transition bg-orange-600 text-white shadow-md';
+        btnDelivery.className = 'flex items-center justify-center space-x-2 py-3 px-3 rounded-xl font-bold text-xs transition bg-[#00864E] text-white shadow-md';
         btnPickup.className = 'flex items-center justify-center space-x-2 py-3 px-3 rounded-xl font-bold text-xs transition bg-transparent text-slate-400 hover:text-white';
         addrGroup.classList.remove('hidden');
         addrInput.value = currentFlow.case.address;
       } else {
-        btnPickup.className = 'flex items-center justify-center space-x-2 py-3 px-3 rounded-xl font-bold text-xs transition bg-orange-600 text-white shadow-md';
+        btnPickup.className = 'flex items-center justify-center space-x-2 py-3 px-3 rounded-xl font-bold text-xs transition bg-[#00864E] text-white shadow-md';
         btnDelivery.className = 'flex items-center justify-center space-x-2 py-3 px-3 rounded-xl font-bold text-xs transition bg-transparent text-slate-400 hover:text-white';
         addrGroup.classList.remove('hidden');
         addrInput.value = `Afhentes i ${currentFlow.supplier.name} Drive-in (Nærmeste afdeling Aarhus)`;
@@ -1889,9 +1902,9 @@
       document.getElementById('order-time-custom').value = presetText;
       
       document.querySelectorAll('.time-btn').forEach(btn => {
-        btn.className = 'time-btn p-2.5 rounded-xl border border-slate-700 bg-slate-800/90 text-left hover:border-orange-500 transition active:scale-95';
+        btn.className = 'time-btn p-2.5 rounded-xl border border-slate-700 bg-slate-800/90 text-left hover:border-[#52A633] transition active:scale-95';
       });
-      event.currentTarget.className = 'time-btn active border-2 border-orange-500 bg-orange-950/30 p-2.5 rounded-xl text-left transition active:scale-95';
+      event.currentTarget.className = 'time-btn active border-2 border-[#52A633] bg-orange-950/30 p-2.5 rounded-xl text-left transition active:scale-95';
       lucide.createIcons();
     }
 
@@ -2379,7 +2392,7 @@
         bodyEl.innerHTML = tableHtml;
 
       } else if (att.isImage && att.dataUrl) {
-        iconBox.className = 'w-10 h-10 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center border border-orange-500/30';
+        iconBox.className = 'w-10 h-10 rounded-xl bg-[#00864E]/20 text-[#52A633] flex items-center justify-center border border-[#52A633]/30';
         iconBox.innerHTML = '<i data-lucide="camera" class="w-5 h-5"></i>';
         excelBanner.classList.add('hidden');
         bodyEl.innerHTML = `<div class="flex justify-center p-2"><img src="${att.dataUrl}" alt="${escapeHtml(att.name)}" class="max-h-[55vh] object-contain rounded-lg border border-slate-700"></div>`;
@@ -2619,7 +2632,7 @@
         typePill.textContent = 'BESTILLING GENNEMFØRT';
         headerTitle.textContent = 'Ordrereference';
 
-        document.getElementById('receipt-order-id').className = 'text-2xl font-mono font-black text-orange-400 mt-1 tracking-wider select-all';
+        document.getElementById('receipt-order-id').className = 'text-2xl font-mono font-black text-[#52A633] mt-1 tracking-wider select-all';
 
         document.getElementById('receipt-action-1-title').textContent = 'Mail afsendt til leverandør:';
         document.getElementById('receipt-supplier-mail-info').textContent = 
@@ -2745,9 +2758,9 @@
 
     function filterHistoryDisplay(filter) {
       historyFilter = filter;
-      document.getElementById('hist-tab-all').className = (filter === 'all') ? 'flex-1 py-1.5 rounded-lg bg-orange-600 text-white transition' : 'flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white transition';
-      document.getElementById('hist-tab-orders').className = (filter === 'orders') ? 'flex-1 py-1.5 rounded-lg bg-orange-600 text-white transition' : 'flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white transition';
-      document.getElementById('hist-tab-returns').className = (filter === 'returns') ? 'flex-1 py-1.5 rounded-lg bg-orange-600 text-white transition' : 'flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white transition';
+      document.getElementById('hist-tab-all').className = (filter === 'all') ? 'flex-1 py-1.5 rounded-lg bg-[#00864E] text-white transition' : 'flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white transition';
+      document.getElementById('hist-tab-orders').className = (filter === 'orders') ? 'flex-1 py-1.5 rounded-lg bg-[#00864E] text-white transition' : 'flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white transition';
+      document.getElementById('hist-tab-returns').className = (filter === 'returns') ? 'flex-1 py-1.5 rounded-lg bg-[#00864E] text-white transition' : 'flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white transition';
       renderHistoryScreen();
     }
 
@@ -2780,7 +2793,7 @@
         item.innerHTML = `
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-2">
-              <span class="font-mono text-xs font-bold ${isRetur ? 'text-amber-400' : 'text-orange-400'}">${o.id}</span>
+              <span class="font-mono text-xs font-bold ${isRetur ? 'text-amber-400' : 'text-[#52A633]'}">${o.id}</span>
               <span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${isRetur ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}">
                 ${isRetur ? 'Returvare • Watcher Aktiv' : 'Bestilling • Afsendt'}
               </span>
@@ -2811,7 +2824,7 @@
                 <span>Epikur overvåger kreditnota</span>
               </span>
             ` : `
-              <button onclick="simulateThreeWayForOrder('${o.id}')" class="text-xs text-orange-400 hover:text-orange-300 font-bold flex items-center space-x-1">
+              <button onclick="simulateThreeWayForOrder('${o.id}')" class="text-xs text-[#52A633] hover:text-orange-300 font-bold flex items-center space-x-1">
                 <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
                 <span>Se Epikur 3-vejs match</span>
               </button>
@@ -2858,7 +2871,7 @@
                 </span>
                 <span class="font-mono text-xs font-bold text-white">${d.invoiceNo}</span>
                 <span class="text-slate-500">|</span>
-                <span class="text-xs font-bold text-orange-400">${d.supplier}</span>
+                <span class="text-xs font-bold text-[#52A633]">${d.supplier}</span>
               </div>
               <div class="flex items-center space-x-2">
                 <span class="text-xs font-bold text-slate-400">Differens:</span>
@@ -3020,7 +3033,7 @@
 
       tTitle.textContent = title;
       tDesc.textContent = desc;
-      iconBox.className = 'w-8 h-8 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center shrink-0 border border-orange-500/30';
+      iconBox.className = 'w-8 h-8 rounded-xl bg-[#00864E]/20 text-[#52A633] flex items-center justify-center shrink-0 border border-[#52A633]/30';
 
       toast.classList.remove('hidden');
       if (window.toastTimer) clearTimeout(window.toastTimer);
