@@ -111,7 +111,7 @@
   <div id="app-shell" class="w-full max-w-full lg:max-w-7xl mx-auto transition-all duration-300 min-h-screen sm:min-h-[920px] bg-slate-900 sm:rounded-3xl border sm:border-slate-800 shadow-2xl flex flex-col overflow-hidden relative">
 
     <!-- Top Status / Branding Bar -->
-    <header class="bg-slate-900/95 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40 px-4 py-3.5 flex items-center justify-between">
+    <header class="bg-slate-900/95 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40 px-4 py-3 flex items-center justify-between">
       <div class="flex items-center space-x-3 cursor-pointer" onclick="setAppMode('order')">
         <div class="p-1.5 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center shadow-lg">
           <svg width="32" height="20" viewBox="0 0 80 50" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -133,6 +133,38 @@
       </div>
 
       <div class="flex items-center space-x-2">
+        <!-- Aktiv Bruger / Profilvælger (Krav 1) -->
+        <div class="relative">
+          <button id="user-profile-btn" onclick="toggleUserDropdown()" title="Aktiv brugerprofil - Klik for at skifte"
+            class="flex items-center space-x-2 bg-slate-800/90 hover:bg-slate-700 border border-slate-700 hover:border-[#52A633]/60 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs active:scale-95 transition">
+            <div class="w-6 h-6 rounded-lg bg-[#00864E] text-white flex items-center justify-center font-black text-[11px] shadow-sm">
+              <span id="header-user-avatar">M</span>
+            </div>
+            <div class="text-left hidden sm:block">
+              <div id="header-user-name" class="font-bold text-white text-xs leading-none truncate max-w-[125px]">Marcus Dalland Braae</div>
+              <div id="header-user-role" class="text-[10px] text-slate-400 leading-tight">Projektleder</div>
+            </div>
+            <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
+          </button>
+
+          <!-- Bruger Dropdown Menu -->
+          <div id="user-dropdown-menu" class="hidden absolute right-0 mt-2 w-72 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl z-50 p-2 space-y-1 backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150">
+            <div class="px-3 py-2 border-b border-slate-800 flex items-center justify-between">
+              <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Aktiv Brugerprofil</span>
+              <span class="text-[10px] bg-[#00864E]/20 text-[#52A633] px-1.5 py-0.5 rounded font-bold">Online</span>
+            </div>
+            <div id="user-dropdown-list" class="space-y-1 max-h-56 overflow-y-auto pr-1">
+              <!-- Rendered via JS -->
+            </div>
+            <div class="pt-1 border-t border-slate-800">
+              <button onclick="goToAdminTab('users')" class="w-full text-left px-3 py-2 text-xs font-bold text-[#52A633] hover:bg-slate-800 rounded-xl flex items-center justify-between transition">
+                <span>Administrér medarbejdere i Admin</span>
+                <i data-lucide="users" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
         <!-- Mode Switch: Plads vs Admin Panel -->
         <button id="top-admin-toggle" onclick="toggleAdminView()" title="Skift til Projektleder & Admin Panel"
           class="flex items-center space-x-1.5 bg-slate-800 hover:bg-slate-700 border border-[#52A633]/40 text-[#52A633] px-3 py-1.5 rounded-xl text-xs font-bold active:scale-95 transition">
@@ -304,7 +336,7 @@
         </div>
 
         <!-- 4 Big Distinct Supplier Cards (Responsive grid on desktop) -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+        <div id="supplier-cards-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
           
           <!-- BYGMA (Officielt Bygma Logo) -->
           <button onclick="selectSupplier('Bygma', 'bygma@nortvig-ordrer.dk', 'Tømmer, reglar, gips & isolering')"
@@ -338,9 +370,14 @@
             <div class="absolute top-0 right-0 w-28 h-28 bg-amber-500/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
             <div class="flex items-center justify-between">
               <div class="flex items-center space-x-4">
-                <div class="w-20 h-14 rounded-2xl bg-white p-1.5 flex items-center justify-center shadow-md shrink-0 border border-slate-200">
-                  <img src="data:image/png;base64,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" alt="STARK Officielt Logo" class="max-h-full max-w-full object-contain">
-                </div>
+                <div class="w-24 h-14 rounded-2xl bg-white p-2 flex items-center justify-center shadow-md shrink-0 border border-slate-200"><svg class="h-7 w-auto" viewBox="0 0 160 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- STARK orange icon -->
+  <circle cx="22" cy="24" r="16" fill="#F58220"/>
+  <path d="M22 14 C23.1 14 24 14.9 24 16 C24 17.1 23.1 18 22 18 C20.9 18 20 17.1 20 16 C20 14.9 20.9 14 22 14 Z" fill="#FFFFFF"/>
+  <path d="M17 19.5 H27 V22 H24.5 V33 H22 V27 H20.5 V33 H18 V22 H17 Z" fill="#FFFFFF"/>
+  <!-- STARK wordmark in bold Danish building merchant style -->
+  <text x="48" y="32" font-family="'Montserrat', sans-serif" font-size="24" font-weight="900" fill="#001E41" letter-spacing="1.5">STARK</text>
+</svg></div>
                 <div>
                   <div class="flex items-center space-x-2">
                     <h3 class="text-lg font-bold text-white group-hover:text-amber-400 transition">STARK</h3>
@@ -364,16 +401,18 @@
             <div class="absolute top-0 right-0 w-28 h-28 bg-blue-600/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
             <div class="flex items-center justify-between">
               <div class="flex items-center space-x-4">
-                <div class="w-20 h-14 rounded-2xl bg-[#004785] p-2 flex items-center justify-center shadow-md shrink-0 border border-blue-400/40">
-                  <svg class="h-8 w-auto" viewBox="0 0 160 52" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="160" height="52" rx="6" fill="#004785"/>
-                    <path d="M14 10 L28 26 L14 42 H24 L33 31 L42 42 H52 L38 26 L52 10 H42 L33 21 L24 10 Z" fill="#FFFFFF"/>
-                    <path d="M58 10 H68 V34 H90 V42 H58 Z" fill="#FFFFFF"/>
-                    <rect x="94" y="23" width="14" height="6" fill="#cfba81"/>
-                    <path d="M112 10 H128 C135 10 139 13 139 17 C139 20 137 23 133 24 C138 25 141 29 141 34 C141 39 136 42 128 42 H112 Z M122 17 V23 H127 C130 23 131 22 131 20 C131 18 130 17 127 17 Z M122 29 V35 H128 C131 35 133 34 133 32 C133 30 131 29 128 29 Z" fill="#cfba81"/>
-                    <path d="M144 10 L150 24 V42 H144 V26 L138 10 Z" fill="#cfba81"/>
-                  </svg>
-                </div>
+                <div class="w-24 h-14 rounded-2xl bg-[#004785] p-1.5 flex items-center justify-center shadow-md shrink-0 border border-blue-400/40"><svg class="h-8 w-auto" viewBox="0 0 160 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="160" height="50" rx="8" fill="#004785"/>
+  <!-- XL in heavy white -->
+  <path d="M16 12 L28 25 L16 38 H25 L32 29.5 L39 38 H48 L36 25 L48 12 H39 L32 20.5 L25 12 H16 Z" fill="#FFFFFF"/>
+  <path d="M53 12 H62 V31 H78 V38 H53 V12 Z" fill="#FFFFFF"/>
+  <!-- Dash in gold -->
+  <rect x="82" y="23" width="9" height="5" rx="1" fill="#CFBA81"/>
+  <!-- BYG in gold/orange -->
+  <path d="M96 12 H107 C112 12 115 14 115 17.5 C115 19.5 113.5 21.5 110.5 22.5 C114 23.5 116 26 116 30 C116 35 112 38 106.5 38 H96 V12 Z M104 18 V22 H106.5 C108.5 22 109.5 21 109.5 19.5 C109.5 18 108.5 18 106.5 18 H104 Z M104 28 V32 H107 C109.5 32 110.5 31 110.5 29.5 C110.5 28 109.5 28 107 28 H104 Z" fill="#CFBA81"/>
+  <path d="M119 12 L125 25 V38 H131 V25 L137 12 H130 L128 18.5 L126 12 H119 Z" fill="#CFBA81"/>
+  <path d="M140 25 C140 17 144 12 151 12 C156 12 158.5 14.5 159.5 18 L154 19.5 C153.5 18 152.5 17 151 17 C147.5 17 146 20.5 146 25 C146 29.5 147.5 33 151 33 C153 33 154 32 154.5 30.5 H150.5 V26.5 H160 V33 C158 36.5 155 38 151 38 C144 38 140 33 140 25 Z" fill="#CFBA81"/>
+</svg></div>
                 <div>
                   <div class="flex items-center space-x-2">
                     <h3 class="text-lg font-bold text-white group-hover:text-blue-400 transition">XL-BYG</h3>
@@ -689,19 +728,37 @@
 
           </div>
 
-          <!-- 6. BESTILLER & BEMÆRKNING -->
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Bestiller (Navn)</label>
-              <input type="text" id="order-sender" required
-                value="Marcus Dalland Braae"
-                class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:border-[#52A633] focus:outline-none">
+          <!-- 6. BESTILLER & PERSONLIG EMAIL-SIGNATUR -->
+          <div class="space-y-3">
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Bestiller (Navn)</label>
+                <input type="text" id="order-sender" required
+                  value="Marcus Dalland Braae"
+                  class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:border-[#52A633] focus:outline-none"
+                  oninput="updateActiveUserPreview()">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Mobilnr. på pladsen</label>
+                <input type="tel" id="order-phone" required
+                  value="+45 22 88 14 00"
+                  class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:border-[#52A633] focus:outline-none"
+                  oninput="updateActiveUserPreview()">
+              </div>
             </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Mobilnr. på pladsen</label>
-              <input type="tel" id="order-phone" required
-                value="+45 22 88 14 00"
-                class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:border-[#52A633] focus:outline-none">
+
+            <!-- Personlig E-mailsignatur Preview (Krav 2) -->
+            <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800 space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center space-x-1">
+                  <i data-lucide="mail-check" class="w-3.5 h-3.5 text-[#52A633]"></i>
+                  <span>Personlig E-mailsignatur på bestillingen:</span>
+                </span>
+                <span class="text-[10px] text-[#52A633] bg-[#00864E]/20 px-2 py-0.5 rounded font-bold">Synlig for trælasten</span>
+              </div>
+              <div id="order-signature-preview" class="p-2.5 bg-slate-900 rounded-lg border border-slate-800/80 font-mono text-xs text-slate-300 leading-relaxed">
+                <!-- Dynamically rendered signature -->
+              </div>
             </div>
           </div>
 
@@ -914,18 +971,34 @@
           </div>
 
           <!-- 5. HÅNDVÆRKER / SVEND PÅ PLADSEN -->
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Meldt retur af</label>
-              <input type="text" id="return-sender" required
-                value="Mikkel H. (Svend)"
-                class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:border-amber-500 focus:outline-none">
+          <div class="space-y-3">
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Meldt retur af</label>
+                <input type="text" id="return-sender" required
+                  value="Marcus Dalland Braae"
+                  class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:border-amber-500 focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Mobilnr. på pladsen</label>
+                <input type="tel" id="return-phone" required
+                  value="+45 22 88 14 00"
+                  class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:border-amber-500 focus:outline-none">
+              </div>
             </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Mobilnr. på pladsen</label>
-              <input type="tel" id="return-phone" required
-                value="+45 28 44 91 10"
-                class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:border-amber-500 focus:outline-none">
+
+            <!-- Personlig E-mailsignatur Preview for Return -->
+            <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800 space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center space-x-1">
+                  <i data-lucide="mail-check" class="w-3.5 h-3.5 text-amber-400"></i>
+                  <span>Personlig E-mailsignatur på returseddel:</span>
+                </span>
+                <span class="text-[10px] text-amber-400 bg-amber-500/20 px-2 py-0.5 rounded font-bold">Kontakt på byggeplads</span>
+              </div>
+              <div id="return-signature-preview" class="p-2.5 bg-slate-900 rounded-lg border border-slate-800/80 font-mono text-xs text-slate-300 leading-relaxed">
+                <!-- Dynamically rendered signature -->
+              </div>
             </div>
           </div>
 
@@ -1019,6 +1092,19 @@
 
         <!-- Summary Card -->
         <div class="bg-slate-800/60 rounded-2xl border border-slate-700/80 p-4 space-y-2.5 text-xs">
+          <!-- Personlig E-mailsignatur påført ordren (Krav 2) -->
+          <div class="p-3 bg-slate-900/90 rounded-xl border border-emerald-500/30 space-y-1.5 mb-2">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-bold text-white flex items-center space-x-1.5">
+                <i data-lucide="mail-check" class="w-4 h-4 text-[#52A633]"></i>
+                <span>Personlig afsendersignatur påført ordren:</span>
+              </span>
+              <span class="text-[10px] bg-[#00864E]/20 text-[#52A633] px-2 py-0.5 rounded font-bold">Direkte kontakt</span>
+            </div>
+            <div id="receipt-sender-signature" class="font-mono text-xs text-slate-300 whitespace-pre-line leading-relaxed pl-1 border-l-2 border-[#52A633]">
+              <!-- Populated via renderReceipt() -->
+            </div>
+          </div>
           <div class="flex justify-between items-center pb-2 border-b border-slate-700/60">
             <span class="text-slate-400">Sag:</span>
             <span id="receipt-sag" class="font-bold text-white">Sag 2401 - Risskov</span>
@@ -1103,6 +1189,7 @@
 
       <!-- ========================================================================= -->
       <!-- SCREEN 6: ADMIN & PROJEKTLEDER PANEL (Marcus Dashboard) -->
+      <!-- SCREEN 6: ADMIN & PROJEKTLEDER PANEL -->
       <section id="screen-admin" class="hidden flex-col space-y-6">
         
         <!-- Dashboard Top Header -->
@@ -1110,12 +1197,12 @@
           <div>
             <div class="flex items-center space-x-2 mb-1.5">
               <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-black bg-[#00864E]/20 text-[#52A633] border border-[#52A633]/30">
-                PROJEKTLEDER & KONTORVISNING
+                PROJEKTLEDER & ADMIN PANEL
               </span>
-              <span class="text-xs text-slate-400 font-medium">Marcus Dalland Braae</span>
+              <span id="admin-header-active-user-badge" class="text-xs text-slate-400 font-medium">Marcus Dalland Braae (Projektleder)</span>
             </div>
-            <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Faktura- & Kreditkontrol</h2>
-            <p class="text-xs sm:text-sm text-slate-400 mt-0.5">Enkelt overblik over fejlfakturaer og udestående kreditnotaer.</p>
+            <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Styring, Leverandører & Kontrol</h2>
+            <p class="text-xs sm:text-sm text-slate-400 mt-0.5">Fakturakontrol i E-komplet, trælastkartotek med faste sælgere og medarbejderstyring.</p>
           </div>
 
           <div class="flex items-center space-x-2">
@@ -1130,55 +1217,154 @@
           </div>
         </div>
 
-        <!-- 2 STORE OVERSKUELIGE KORT (Simpelt & krystalklart for projektleder) -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          
-          <!-- KORT 1: FEJLFAKTURAER -->
-          <div class="bg-slate-850/90 rounded-3xl border border-red-500/40 overflow-hidden shadow-2xl flex flex-col">
-            <div class="p-5 border-b border-slate-800 bg-red-950/20 flex items-center justify-between">
+        <!-- Admin Navigation Tabs: Fakturakontrol / Leverandører & Sælgere / Medarbejdere (Krav 1 & 3) -->
+        <div class="flex items-center space-x-2 border-b border-slate-800 pb-2 overflow-x-auto no-scrollbar">
+          <button id="admin-tab-btn-invoices" onclick="switchAdminTab('invoices')"
+            class="flex items-center space-x-2 px-4 py-2.5 rounded-xl font-bold text-xs transition bg-[#00864E] text-white shadow">
+            <i data-lucide="shield-alert" class="w-4 h-4"></i>
+            <span>Faktura- & Kreditkontrol</span>
+            <span id="admin-tab-invoice-count" class="px-1.5 py-0.2 rounded-full bg-red-500 text-white text-[10px] font-black">2</span>
+          </button>
+
+          <button id="admin-tab-btn-suppliers" onclick="switchAdminTab('suppliers')"
+            class="flex items-center space-x-2 px-4 py-2.5 rounded-xl font-bold text-xs transition text-slate-400 hover:text-white hover:bg-slate-800">
+            <i data-lucide="truck" class="w-4 h-4 text-amber-400"></i>
+            <span>Leverandører & Sælgere</span>
+            <span class="px-1.5 py-0.2 rounded-full bg-slate-800 text-slate-300 text-[10px] font-bold border border-slate-700">4</span>
+          </button>
+
+          <button id="admin-tab-btn-users" onclick="switchAdminTab('users')"
+            class="flex items-center space-x-2 px-4 py-2.5 rounded-xl font-bold text-xs transition text-slate-400 hover:text-white hover:bg-slate-800">
+            <i data-lucide="users" class="w-4 h-4 text-blue-400"></i>
+            <span>Medarbejdere & Roller</span>
+            <span id="admin-tab-user-count" class="px-1.5 py-0.2 rounded-full bg-slate-800 text-slate-300 text-[10px] font-bold border border-slate-700">3</span>
+          </button>
+        </div>
+
+        <!-- TAB CONTENT 1: FAKTURA- & KREDITKONTROL -->
+        <div id="admin-view-invoices" class="space-y-6">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- KORT 1: FEJLFAKTURAER -->
+            <div class="bg-slate-850/90 rounded-3xl border border-red-500/40 overflow-hidden shadow-2xl flex flex-col">
+              <div class="p-5 border-b border-slate-800 bg-red-950/20 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                  <div class="w-10 h-10 rounded-2xl bg-red-600/20 text-red-400 flex items-center justify-center border border-red-500/40">
+                    <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-base font-bold text-white leading-tight">🚨 Fejlfakturaer</h3>
+                    <p class="text-xs text-slate-400">Fakturaer der afviger fra bestilt mængde eller aftalepris</p>
+                  </div>
+                </div>
+                <span class="px-3 py-1 rounded-full text-xs font-black bg-red-500/20 text-red-300 border border-red-500/40" id="discrepancy-counter-tag">
+                  2 kræver handling
+                </span>
+              </div>
+
+              <div id="discrepancy-list" class="p-4 sm:p-5 space-y-4 flex-1">
+                <!-- Rendered via JS -->
+              </div>
+            </div>
+
+            <!-- KORT 2: MANGLER KREDITNOTA -->
+            <div class="bg-slate-850/90 rounded-3xl border border-slate-700/80 overflow-hidden shadow-2xl flex flex-col">
+              <div class="p-5 border-b border-slate-800 bg-slate-800/40 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                  <div class="w-10 h-10 rounded-2xl bg-slate-700/60 text-slate-300 flex items-center justify-center border border-slate-600">
+                    <i data-lucide="hourglass" class="w-5 h-5"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-base font-bold text-white leading-tight">⏳ Mangler Kreditnota</h3>
+                    <p class="text-xs text-slate-400">Varer returneret fra pladsen hvor kreditnota afventes</p>
+                  </div>
+                </div>
+                <span class="px-3 py-1 rounded-full text-xs font-black bg-slate-700 text-slate-200 border border-slate-600" id="pending-counter-tag">
+                  3 udestående
+                </span>
+              </div>
+
+              <div id="pending-returns-list" class="p-4 sm:p-5 space-y-4 flex-1">
+                <!-- Rendered via JS -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- TAB CONTENT 2: TRÆLAST- & LEVERANDØRKARTOTEK (Krav 3) -->
+        <div id="admin-view-suppliers" class="hidden space-y-5">
+          <div class="bg-slate-850/90 rounded-3xl border border-slate-700/80 p-5 shadow-2xl space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
               <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-2xl bg-red-600/20 text-red-400 flex items-center justify-center border border-red-500/40">
-                  <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                <div class="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
+                  <i data-lucide="truck" class="w-5 h-5"></i>
                 </div>
                 <div>
-                  <h3 class="text-base font-bold text-white leading-tight">🚨 Fejlfakturaer</h3>
-                  <p class="text-xs text-slate-400">Fakturaer der afviger fra bestilt mængde eller aftalepris</p>
+                  <h3 class="text-lg font-black text-white">Leverandører & Faste Trælastsælgere</h3>
+                  <p class="text-xs text-slate-400">Redigér kontaktoplysninger for Bygma, STARK, XL-Byg og Würth. Ændringer gemmes i localStorage og gælder straks for alle fremtidige bestillinger.</p>
                 </div>
               </div>
-              <span class="px-3 py-1 rounded-full text-xs font-black bg-red-500/20 text-red-300 border border-red-500/40" id="discrepancy-counter-tag">
-                2 kræver handling
-              </span>
+              <button onclick="resetSuppliersToDefault()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-xl text-xs font-semibold active:scale-95 transition">
+                Gendan standardværdier
+              </button>
             </div>
 
-            <!-- Discrepancy Items Container -->
-            <div id="discrepancy-list" class="p-4 sm:p-5 space-y-4 flex-1">
-              <!-- Rendered via JS -->
+            <!-- Supplier Cards Grid -->
+            <div id="admin-suppliers-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Rendered via renderAdminSuppliers() -->
             </div>
           </div>
+        </div>
 
-          <!-- KORT 2: MANGLER KREDITNOTA -->
-          <div class="bg-slate-850/90 rounded-3xl border border-slate-700/80 overflow-hidden shadow-2xl flex flex-col">
-            <div class="p-5 border-b border-slate-800 bg-slate-800/40 flex items-center justify-between">
+        <!-- TAB CONTENT 3: BRUGERSTYRING & MEDARBEJDERE (Krav 1) -->
+        <div id="admin-view-users" class="hidden space-y-5">
+          <div class="bg-slate-850/90 rounded-3xl border border-slate-700/80 p-5 shadow-2xl space-y-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
               <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-2xl bg-slate-700/60 text-slate-300 flex items-center justify-center border border-slate-600">
-                  <i data-lucide="hourglass" class="w-5 h-5"></i>
+                <div class="w-10 h-10 rounded-2xl bg-blue-500/20 text-blue-400 flex items-center justify-center border border-blue-500/30">
+                  <i data-lucide="users" class="w-5 h-5"></i>
                 </div>
                 <div>
-                  <h3 class="text-base font-bold text-white leading-tight">⏳ Mangler Kreditnota</h3>
-                  <p class="text-xs text-slate-400">Varer returneret fra pladsen hvor kreditnota afventes</p>
+                  <h3 class="text-lg font-black text-white">Medarbejderkartotek & Profilstyring</h3>
+                  <p class="text-xs text-slate-400">Tilføj medarbejdere, ret kontaktoplysninger og vælg hvem der pt. er logget ind på enheden.</p>
                 </div>
               </div>
-              <span class="px-3 py-1 rounded-full text-xs font-black bg-slate-700 text-slate-200 border border-slate-600" id="pending-counter-tag">
-                3 udestående
-              </span>
+              <button onclick="toggleAddUserModal(true)" class="px-4 py-2 bg-[#00864E] hover:bg-[#52A633] text-white rounded-xl text-xs font-bold flex items-center space-x-1.5 shadow-md active:scale-95 transition">
+                <i data-lucide="user-plus" class="w-4 h-4"></i>
+                <span>Tilføj Ny Medarbejder</span>
+              </button>
             </div>
 
-            <!-- Pending Returns Items Container -->
-            <div id="pending-returns-list" class="p-4 sm:p-5 space-y-4 flex-1">
-              <!-- Rendered via JS -->
+            <!-- Active User Display Card -->
+            <div class="p-4 rounded-2xl bg-slate-900 border-2 border-[#52A633]/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="flex items-center space-x-3.5">
+                <div class="w-12 h-12 rounded-2xl bg-[#00864E] text-white flex items-center justify-center font-black text-lg shadow-md">
+                  <span id="active-user-card-avatar">M</span>
+                </div>
+                <div>
+                  <div class="flex items-center space-x-2">
+                    <span class="text-xs uppercase font-bold text-[#52A633]">Nuværende Aktiv Profil</span>
+                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                  </div>
+                  <div id="active-user-card-name" class="text-lg font-black text-white">Marcus Dalland Braae</div>
+                  <div id="active-user-card-role" class="text-xs text-slate-300">Projektleder • Tlf: +45 22 88 14 00 • mdb@nortvig.dk</div>
+                </div>
+              </div>
+              <div class="text-xs text-slate-400 bg-slate-950 px-3 py-2 rounded-xl border border-slate-800">
+                ⚡ Bruges automatisk til bestillinger, E-komplet faktura-afvisninger og signaturer.
+              </div>
             </div>
+
+            <!-- Users List Cards -->
+            <div class="space-y-3">
+              <h4 class="text-xs uppercase tracking-wider font-bold text-slate-400">Registrerede Medarbejdere</h4>
+              <div id="admin-users-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                <!-- Rendered dynamically via renderAdminUsers() -->
+              </div>
+            </div>
+
           </div>
-
         </div>
 
       </section>
@@ -1187,6 +1373,67 @@
 
     <!-- ========================================================================= -->
     <!-- DRAWER / MODAL: EPIKUR 3-VEJS MATCH SIMULATION -->
+        <!-- MODAL: TILFØJ NY MEDARBEJDER (Krav 1) -->
+    <div id="add-user-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="w-full max-w-md bg-slate-900 border border-slate-700 rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        <div class="p-4 border-b border-slate-800 bg-slate-850 flex items-center justify-between">
+          <div class="flex items-center space-x-2.5">
+            <div class="w-8 h-8 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center">
+              <i data-lucide="user-plus" class="w-4 h-4"></i>
+            </div>
+            <h3 class="text-sm font-bold text-white">Tilføj Medarbejder</h3>
+          </div>
+          <button onclick="toggleAddUserModal(false)" class="p-1 rounded-lg text-slate-400 hover:text-white">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <form id="add-user-form" onsubmit="handleCreateUserSubmit(event)" class="p-4 space-y-3 text-xs">
+          <div>
+            <label class="block text-slate-400 font-bold uppercase mb-1">Fulde Navn *</label>
+            <input type="text" id="new-user-name" required placeholder="F.eks. Anders Jensen"
+              class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white focus:border-[#52A633] focus:outline-none">
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-slate-400 font-bold uppercase mb-1">Titel / Stilling *</label>
+              <input type="text" id="new-user-title" required placeholder="F.eks. Tømrer / Svend"
+                class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white focus:border-[#52A633] focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-slate-400 font-bold uppercase mb-1">Rolle i App *</label>
+              <select id="new-user-role" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white focus:border-[#52A633] focus:outline-none">
+                <option value="Svend">Svend</option>
+                <option value="Formand">Formand</option>
+                <option value="Projektleder">Projektleder</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-slate-400 font-bold uppercase mb-1">Mobilnummer *</label>
+              <input type="tel" id="new-user-phone" required placeholder="+45 20 00 00 00"
+                class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white focus:border-[#52A633] focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-slate-400 font-bold uppercase mb-1">E-mail *</label>
+              <input type="email" id="new-user-email" required placeholder="navn@nortvig.dk"
+                class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white focus:border-[#52A633] focus:outline-none">
+            </div>
+          </div>
+
+          <div class="pt-3 flex items-center justify-end space-x-2 border-t border-slate-800">
+            <button type="button" onclick="toggleAddUserModal(false)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-semibold">
+              Annullér
+            </button>
+            <button type="submit" class="px-4 py-2 bg-[#00864E] hover:bg-[#52A633] text-white rounded-xl font-bold">
+              Gem Medarbejder
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <!-- ========================================================================= -->
     <div id="three-way-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
       <div class="w-full max-w-lg bg-slate-900 border border-slate-700 sm:rounded-3xl rounded-t-3xl shadow-2xl max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom duration-200">
@@ -1390,6 +1637,57 @@
       { id: '2365', number: 'Sag 2365', name: 'Havneholmen Aarhus Ø', type: 'Erhverv', address: 'Bernhardt Jensens Blvd 8, 8000 Aarhus C', manager: 'Henrik P.', popular: false }
     ];
 
+    // MEDARBEJDERE & PROFILER (Krav 1)
+    const DEFAULT_USERS = [
+      { id: 'u1', name: 'Marcus Dalland Braae', title: 'Projektleder', phone: '+45 22 88 14 00', email: 'mdb@nortvig.dk', role: 'Projektleder', active: true },
+      { id: 'u2', name: 'Mikkel H.', title: 'Tømrer & Byggeformand', phone: '+45 28 44 91 10', email: 'mh@nortvig.dk', role: 'Formand', active: false },
+      { id: 'u3', name: 'Henrik P.', title: 'Tømrersvend', phone: '+45 21 33 55 70', email: 'hp@nortvig.dk', role: 'Svend', active: false }
+    ];
+
+    // FAST TRÆLAST- & LEVERANDØRKARTOTEK (Krav 3)
+    const DEFAULT_SUPPLIERS = {
+      'Bygma': {
+        key: 'Bygma',
+        name: 'Bygma',
+        seller: 'Lars Christensen',
+        phone: '+45 87 34 20 10',
+        email: 'ordre@bygma-aarhus.dk',
+        desc: 'Tømmer, reglar, gips & isolering',
+        tag: 'Hovedaftale',
+        badgeColor: 'border-red-500/30 text-red-300 bg-red-500/20'
+      },
+      'STARK': {
+        key: 'STARK',
+        name: 'STARK',
+        seller: 'Kasper Vestergaard',
+        phone: '+45 89 32 44 00',
+        email: 'ordre@stark-aarhus.dk',
+        desc: 'Byggematerialer, værktøj & beklædning',
+        tag: 'Drive-in & Lager',
+        badgeColor: 'border-amber-500/30 text-amber-300 bg-amber-500/20'
+      },
+      'XL-BYG': {
+        key: 'XL-BYG',
+        name: 'XL-BYG',
+        seller: 'Thomas Møller',
+        phone: '+45 86 19 22 30',
+        email: 'ordre@xlbyg-aarhus.dk',
+        desc: 'Tømmerhandel, døre, tag & vinduer',
+        tag: 'Lokalpartner',
+        badgeColor: 'border-blue-500/30 text-blue-300 bg-blue-500/20'
+      },
+      'Würth': {
+        key: 'Würth',
+        name: 'Würth',
+        seller: 'Morten Lind',
+        phone: '+45 70 20 30 40',
+        email: 'ordre@wuerth.dk',
+        desc: 'Fast leverandør af skruer & befæstigelse',
+        tag: 'Fast Aftale',
+        badgeColor: 'bg-red-500 text-white font-black'
+      }
+    };
+
     // Pre-loaded Discrepancy Log for Admin Panel
     let adminDiscrepancies = [
       {
@@ -1488,10 +1786,581 @@
     let historyFilter = 'all';
 
     // ==========================================
+    // BRUGERSTYRING & PROFILHÅNDTERING (Krav 1)
+    // ==========================================
+    function getStoredUsers() {
+      try {
+        const data = localStorage.getItem('nortvig_app_users_v2');
+        if (data) return JSON.parse(data);
+      } catch(e) {}
+      localStorage.setItem('nortvig_app_users_v2', JSON.stringify(DEFAULT_USERS));
+      return DEFAULT_USERS;
+    }
+
+    function saveStoredUsers(users) {
+      localStorage.setItem('nortvig_app_users_v2', JSON.stringify(users));
+      renderAdminUsers();
+      renderUserDropdown();
+      updateActiveUserUI();
+    }
+
+    function getActiveUserId() {
+      return localStorage.getItem('nortvig_active_user_id') || 'u1';
+    }
+
+    function getActiveUser() {
+      const users = getStoredUsers();
+      const activeId = getActiveUserId();
+      return users.find(u => u.id === activeId) || users[0] || DEFAULT_USERS[0];
+    }
+
+    function setActiveUser(userId) {
+      localStorage.setItem('nortvig_active_user_id', userId);
+      const activeUser = getActiveUser();
+      
+      // Update current flow sender details
+      currentFlow.sender = activeUser.name;
+      currentFlow.phone = activeUser.phone;
+      
+      const orderSender = document.getElementById('order-sender');
+      const orderPhone = document.getElementById('order-phone');
+      const returnSender = document.getElementById('return-sender');
+      const returnPhone = document.getElementById('return-phone');
+      
+      if (orderSender) orderSender.value = activeUser.name;
+      if (orderPhone) orderPhone.value = activeUser.phone;
+      if (returnSender) returnSender.value = activeUser.name;
+      if (returnPhone) returnPhone.value = activeUser.phone;
+
+      updateActiveUserUI();
+      renderUserDropdown();
+      renderAdminUsers();
+      toggleUserDropdown(false);
+
+      showToast('Aktiv profil skiftet', `Du handler nu som ${activeUser.name} (${activeUser.role})`);
+    }
+
+    function toggleUserDropdown(force) {
+      const menu = document.getElementById('user-dropdown-menu');
+      if (!menu) return;
+      if (typeof force === 'boolean') {
+        if (force) menu.classList.remove('hidden');
+        else menu.classList.add('hidden');
+      } else {
+        menu.classList.toggle('hidden');
+      }
+    }
+
+    // Close dropdown on click outside
+    document.addEventListener('click', (e) => {
+      const btn = document.getElementById('user-profile-btn');
+      const menu = document.getElementById('user-dropdown-menu');
+      if (menu && !menu.classList.contains('hidden')) {
+        if (btn && !btn.contains(e.target) && !menu.contains(e.target)) {
+          menu.classList.add('hidden');
+        }
+      }
+    });
+
+    function renderUserDropdown() {
+      const list = document.getElementById('user-dropdown-list');
+      if (!list) return;
+      const users = getStoredUsers();
+      const activeId = getActiveUserId();
+
+      list.innerHTML = users.map(u => {
+        const isCurrent = u.id === activeId;
+        const initial = u.name.charAt(0).toUpperCase();
+        return `
+          <button type="button" onclick="setActiveUser('${u.id}')"
+            class="w-full text-left p-2 rounded-xl flex items-center justify-between transition ${
+              isCurrent ? 'bg-[#00864E]/20 border border-[#52A633]/40 text-white' : 'hover:bg-slate-800 text-slate-300'
+            }">
+            <div class="flex items-center space-x-2.5 truncate">
+              <div class="w-7 h-7 rounded-lg ${isCurrent ? 'bg-[#00864E] text-white' : 'bg-slate-700 text-slate-300'} flex items-center justify-center font-black text-xs shrink-0">
+                ${initial}
+              </div>
+              <div class="truncate">
+                <div class="font-bold text-xs truncate ${isCurrent ? 'text-white' : 'text-slate-200'}">${escapeHtml(u.name)}</div>
+                <div class="text-[10px] text-slate-400 truncate">${escapeHtml(u.title)} (${escapeHtml(u.role)})</div>
+              </div>
+            </div>
+            ${isCurrent ? '<i data-lucide="check" class="w-4 h-4 text-[#52A633] shrink-0"></i>' : ''}
+          </button>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function updateActiveUserUI() {
+      const activeUser = getActiveUser();
+      const initial = activeUser.name.charAt(0).toUpperCase();
+
+      // Top bar profile display
+      const topAvatar = document.getElementById('header-user-avatar');
+      const topName = document.getElementById('header-user-name');
+      const topRole = document.getElementById('header-user-role');
+      if (topAvatar) topAvatar.textContent = initial;
+      if (topName) topName.textContent = activeUser.name;
+      if (topRole) topRole.textContent = `${activeUser.role} • A/S Nortvig`;
+
+      // Admin header badge
+      const adminBadge = document.getElementById('admin-header-active-user-badge');
+      if (adminBadge) adminBadge.textContent = `${activeUser.name} (${activeUser.role})`;
+
+      // Admin active card
+      const cardAvatar = document.getElementById('active-user-card-avatar');
+      const cardName = document.getElementById('active-user-card-name');
+      const cardRole = document.getElementById('active-user-card-role');
+      if (cardAvatar) cardAvatar.textContent = initial;
+      if (cardName) cardName.textContent = activeUser.name;
+      if (cardRole) cardRole.textContent = `${activeUser.title} (${activeUser.role}) • Tlf: ${activeUser.phone} • ${activeUser.email}`;
+
+      // Update signature previews in order & return forms
+      updateSignaturePreviews();
+    }
+
+    function toggleAddUserModal(show) {
+      const modal = document.getElementById('add-user-modal');
+      if (!modal) return;
+      if (show) {
+        modal.classList.remove('hidden');
+        document.getElementById('add-user-form').reset();
+      } else {
+        modal.classList.add('hidden');
+      }
+      lucide.createIcons();
+    }
+
+    function handleCreateUserSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('new-user-name').value.trim();
+      const title = document.getElementById('new-user-title').value.trim();
+      const role = document.getElementById('new-user-role').value;
+      const phone = document.getElementById('new-user-phone').value.trim();
+      const email = document.getElementById('new-user-email').value.trim();
+
+      if (!name || !title || !phone || !email) {
+        showToast('Udfyld alle felter', 'Navn, stilling, rolle, telefon og mail er påkrævet.');
+        return;
+      }
+
+      const users = getStoredUsers();
+      const newId = 'u_' + Date.now();
+      const newUser = { id: newId, name, title, role, phone, email, active: false };
+      users.push(newUser);
+
+      saveStoredUsers(users);
+      toggleAddUserModal(false);
+      setActiveUser(newId);
+
+      showToast('Medarbejder Tilføjet', `${name} er oprettet og sat som aktiv profil.`);
+    }
+
+    function renderAdminUsers() {
+      const container = document.getElementById('admin-users-list');
+      const countTag = document.getElementById('admin-tab-user-count');
+      if (!container) return;
+
+      const users = getStoredUsers();
+      const activeId = getActiveUserId();
+      if (countTag) countTag.textContent = users.length;
+
+      container.innerHTML = users.map(u => {
+        const isCurrent = u.id === activeId;
+        const initial = u.name.charAt(0).toUpperCase();
+        return `
+          <div class="p-4 rounded-2xl bg-slate-900 border ${
+            isCurrent ? 'border-[#52A633] bg-[#00864E]/10 shadow-lg' : 'border-slate-800'
+          } space-y-3 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <div class="w-8 h-8 rounded-xl ${isCurrent ? 'bg-[#00864E] text-white' : 'bg-slate-800 text-slate-300 border border-slate-700'} flex items-center justify-center font-black text-xs">
+                  ${initial}
+                </div>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${
+                  u.role === 'Projektleder' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' :
+                  u.role === 'Formand' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' :
+                  'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                }">
+                  ${escapeHtml(u.role)}
+                </span>
+              </div>
+              <h5 class="text-sm font-bold text-white leading-tight">${escapeHtml(u.name)}</h5>
+              <div class="text-xs text-slate-400 mt-0.5">${escapeHtml(u.title)}</div>
+              <div class="text-[11px] font-mono text-slate-400 mt-2 space-y-0.5">
+                <div>📞 ${escapeHtml(u.phone)}</div>
+                <div>✉️ ${escapeHtml(u.email)}</div>
+              </div>
+            </div>
+
+            <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between">
+              ${isCurrent ? `
+                <span class="text-xs font-bold text-[#52A633] flex items-center">
+                  <i data-lucide="check-circle-2" class="w-3.5 h-3.5 mr-1"></i> Aktiv Profil
+                </span>
+              ` : `
+                <button type="button" onclick="setActiveUser('${u.id}')"
+                  class="px-3 py-1 bg-slate-800 hover:bg-[#00864E] hover:text-white text-slate-300 rounded-xl text-xs font-bold border border-slate-700 active:scale-95 transition">
+                  Gør til aktiv
+                </button>
+              `}
+              ${users.length > 1 && !isCurrent ? `
+                <button type="button" onclick="deleteUser('${u.id}')" class="text-slate-500 hover:text-red-400 p-1" title="Slet medarbejder">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function deleteUser(userId) {
+      let users = getStoredUsers();
+      const userToDelete = users.find(u => u.id === userId);
+      if (!userToDelete) return;
+      if (!confirm(`Er du sikker på, at du vil fjerne ${userToDelete.name}?`)) return;
+
+      users = users.filter(u => u.id !== userId);
+      saveStoredUsers(users);
+      showToast('Medarbejder fjernet', `${userToDelete.name} er slettet.`);
+    }
+
+    // ==========================================
+    // PERSONLIG EMAIL-SIGNATUR (Krav 2)
+    // ==========================================
+    function generateEmailSignature(user) {
+      const u = user || getActiveUser();
+      return `--
+Med venlig hilsen / Best regards
+${u.name}
+${u.title} | ${u.role}
+Direkte tlf.: ${u.phone}
+E-mail: ${u.email}
+A/S Nortvig • CVR 12345678 • www.nortvig.dk`;
+    }
+
+    function updateSignaturePreviews() {
+      const activeUser = getActiveUser();
+      const sigText = generateEmailSignature(activeUser);
+
+      const orderSig = document.getElementById('order-signature-preview');
+      const returnSig = document.getElementById('return-signature-preview');
+      if (orderSig) orderSig.textContent = sigText;
+      if (returnSig) returnSig.textContent = sigText;
+    }
+
+    function updateActiveUserPreview() {
+      const customName = document.getElementById('order-sender').value;
+      const customPhone = document.getElementById('order-phone').value;
+      const activeUser = getActiveUser();
+      const tempUser = { ...activeUser, name: customName, phone: customPhone };
+      const sigText = generateEmailSignature(tempUser);
+      const orderSig = document.getElementById('order-signature-preview');
+      if (orderSig) orderSig.textContent = sigText;
+    }
+
+    // ==========================================
+    // TRÆLAST- & LEVERANDØRKARTOTEK (Krav 3)
+    // ==========================================
+    function getStoredSuppliers() {
+      try {
+        const data = localStorage.getItem('nortvig_app_suppliers_v2');
+        if (data) return JSON.parse(data);
+      } catch(e) {}
+      localStorage.setItem('nortvig_app_suppliers_v2', JSON.stringify(DEFAULT_SUPPLIERS));
+      return DEFAULT_SUPPLIERS;
+    }
+
+    function saveStoredSuppliers(suppliers) {
+      localStorage.setItem('nortvig_app_suppliers_v2', JSON.stringify(suppliers));
+      renderSupplierSelectionCards();
+      renderAdminSuppliers();
+    }
+
+    function resetSuppliersToDefault() {
+      if (!confirm('Vil du nulstille alle leverandørdata til A/S Nortvigs standardindstillinger?')) return;
+      saveStoredSuppliers(DEFAULT_SUPPLIERS);
+      showToast('Gendannet standard', 'Leverandørkartoteket er nulstillet til standard.');
+    }
+
+    function saveAdminSupplier(key) {
+      const seller = document.getElementById(`sup-seller-${key}`).value.trim();
+      const phone = document.getElementById(`sup-phone-${key}`).value.trim();
+      const email = document.getElementById(`sup-email-${key}`).value.trim();
+
+      const suppliers = getStoredSuppliers();
+      if (!suppliers[key]) return;
+
+      suppliers[key].seller = seller;
+      suppliers[key].phone = phone;
+      suppliers[key].email = email;
+
+      saveStoredSuppliers(suppliers);
+      showToast('Leverandør gemt', `Kontaktoplysninger for ${suppliers[key].name} er opdateret.`);
+    }
+
+    function renderAdminSuppliers() {
+      const container = document.getElementById('admin-suppliers-grid');
+      if (!container) return;
+      const suppliers = getStoredSuppliers();
+
+      container.innerHTML = Object.keys(suppliers).map(key => {
+        const sup = suppliers[key];
+        return `
+          <div class="p-4 sm:p-5 rounded-2xl bg-slate-900/90 border border-slate-700/80 space-y-3.5 shadow-md">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+              <div class="flex items-center space-x-2">
+                <span class="text-base font-black text-white">${sup.name}</span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-md border ${sup.badgeColor}">${sup.tag}</span>
+              </div>
+              <span class="text-[11px] text-[#52A633] font-semibold flex items-center">
+                <i data-lucide="check" class="w-3.5 h-3.5 mr-1"></i> Aktiv konto
+              </span>
+            </div>
+
+            <div class="space-y-2.5 text-xs">
+              <div>
+                <label class="block text-slate-400 font-bold uppercase text-[11px] mb-1">Fast Sælgernavn</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                    <i data-lucide="user" class="w-3.5 h-3.5"></i>
+                  </div>
+                  <input type="text" id="sup-seller-${key}" value="${escapeHtml(sup.seller || '')}"
+                    class="w-full pl-9 pr-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white font-medium focus:border-[#52A633] focus:outline-none">
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-slate-400 font-bold uppercase text-[11px] mb-1">Direkte Telefonnummer</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                    <i data-lucide="phone" class="w-3.5 h-3.5"></i>
+                  </div>
+                  <input type="tel" id="sup-phone-${key}" value="${escapeHtml(sup.phone || '')}"
+                    class="w-full pl-9 pr-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white font-medium focus:border-[#52A633] focus:outline-none">
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-slate-400 font-bold uppercase text-[11px] mb-1">Ordremodtager E-mail</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                    <i data-lucide="mail" class="w-3.5 h-3.5"></i>
+                  </div>
+                  <input type="email" id="sup-email-${key}" value="${escapeHtml(sup.email || '')}"
+                    class="w-full pl-9 pr-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white font-medium focus:border-[#52A633] focus:outline-none">
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-2 flex items-center justify-between">
+              <span class="text-[10px] text-slate-500 italic truncate max-w-[180px]">${sup.desc}</span>
+              <button type="button" onclick="saveAdminSupplier('${key}')"
+                class="px-4 py-2 bg-[#00864E] hover:bg-[#52A633] text-white rounded-xl text-xs font-bold shadow active:scale-95 transition flex items-center space-x-1.5">
+                <i data-lucide="save" class="w-3.5 h-3.5"></i>
+                <span>Gem ændringer</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    // Render the 4 selection cards on Screen 2 (Hvilken leverandør?)
+    function renderSupplierSelectionCards() {
+      const container = document.getElementById('supplier-cards-container');
+      if (!container) return;
+      const suppliers = getStoredSuppliers();
+
+      const supBygma = suppliers['Bygma'] || DEFAULT_SUPPLIERS['Bygma'];
+      const supStark = suppliers['STARK'] || DEFAULT_SUPPLIERS['STARK'];
+      const supXl = suppliers['XL-BYG'] || DEFAULT_SUPPLIERS['XL-BYG'];
+      const supWurth = suppliers['Würth'] || DEFAULT_SUPPLIERS['Würth'];
+
+      container.innerHTML = `
+        <!-- BYGMA -->
+        <button onclick="selectSupplier('Bygma')"
+          class="supplier-card group text-left p-4 sm:p-5 rounded-2xl bg-slate-800/90 hover:bg-slate-800 border-2 border-slate-700/80 hover:border-red-500 active:scale-[0.98] transition shadow-lg relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-28 h-28 bg-red-600/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+              <div class="w-20 h-14 rounded-2xl bg-white p-1.5 flex items-center justify-center shadow-md shrink-0 border border-slate-200">
+                  <img src="data:image/png;base64,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" alt="Bygma Officielt Logo" class="max-h-full max-w-full object-contain">
+                </div>
+              <div>
+                <div class="flex items-center space-x-2">
+                  <h3 class="text-lg font-bold text-white group-hover:text-red-400 transition">Bygma</h3>
+                  <span class="bg-red-500/20 text-red-300 text-[10px] font-bold px-2 py-0.5 rounded-md border border-red-500/30">${supBygma.tag}</span>
+                </div>
+                <p class="text-xs text-slate-400 mt-1">${supBygma.desc}</p>
+                <div class="text-[11px] text-[#52A633] font-medium mt-0.5 flex flex-wrap items-center gap-x-2">
+                  <span>👤 ${escapeHtml(supBygma.seller || 'Lars Christensen')}</span>
+                  <span>📞 ${escapeHtml(supBygma.phone || '+45 87 34 20 10')}</span>
+                </div>
+                <div class="text-[10px] text-slate-500 font-mono mt-0.5 truncate">Ordre: ${escapeHtml(supBygma.email)}</div>
+              </div>
+            </div>
+            <div class="w-8 h-8 rounded-full bg-slate-700/50 flex items-center justify-center text-slate-400 group-hover:text-white group-hover:bg-red-600 transition shrink-0 ml-2">
+              <i data-lucide="chevron-right" class="w-5 h-5"></i>
+            </div>
+          </div>
+        </button>
+
+        <!-- STARK -->
+        <button onclick="selectSupplier('STARK')"
+          class="supplier-card group text-left p-4 sm:p-5 rounded-2xl bg-slate-800/90 hover:bg-slate-800 border-2 border-slate-700/80 hover:border-amber-500 active:scale-[0.98] transition shadow-lg relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-28 h-28 bg-amber-500/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+              <div class="w-24 h-14 rounded-2xl bg-white p-2 flex items-center justify-center shadow-md shrink-0 border border-slate-200"><svg class="h-7 w-auto" viewBox="0 0 160 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- STARK orange icon -->
+  <circle cx="22" cy="24" r="16" fill="#F58220"/>
+  <path d="M22 14 C23.1 14 24 14.9 24 16 C24 17.1 23.1 18 22 18 C20.9 18 20 17.1 20 16 C20 14.9 20.9 14 22 14 Z" fill="#FFFFFF"/>
+  <path d="M17 19.5 H27 V22 H24.5 V33 H22 V27 H20.5 V33 H18 V22 H17 Z" fill="#FFFFFF"/>
+  <!-- STARK wordmark in bold Danish building merchant style -->
+  <text x="48" y="32" font-family="'Montserrat', sans-serif" font-size="24" font-weight="900" fill="#001E41" letter-spacing="1.5">STARK</text>
+</svg></div>
+              <div>
+                <div class="flex items-center space-x-2">
+                  <h3 class="text-lg font-bold text-white group-hover:text-amber-400 transition">STARK</h3>
+                  <span class="bg-amber-500/20 text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded-md border border-amber-500/30">${supStark.tag}</span>
+                </div>
+                <p class="text-xs text-slate-400 mt-1">${supStark.desc}</p>
+                <div class="text-[11px] text-[#52A633] font-medium mt-0.5 flex flex-wrap items-center gap-x-2">
+                  <span>👤 ${escapeHtml(supStark.seller || 'Kasper Vestergaard')}</span>
+                  <span>📞 ${escapeHtml(supStark.phone || '+45 89 32 44 00')}</span>
+                </div>
+                <div class="text-[10px] text-slate-500 font-mono mt-0.5 truncate">Ordre: ${escapeHtml(supStark.email)}</div>
+              </div>
+            </div>
+            <div class="w-8 h-8 rounded-full bg-slate-700/50 flex items-center justify-center text-slate-400 group-hover:text-white group-hover:bg-amber-500 group-hover:text-slate-950 transition shrink-0 ml-2">
+              <i data-lucide="chevron-right" class="w-5 h-5"></i>
+            </div>
+          </div>
+        </button>
+
+        <!-- XL-BYG -->
+        <button onclick="selectSupplier('XL-BYG')"
+          class="supplier-card group text-left p-4 sm:p-5 rounded-2xl bg-slate-800/90 hover:bg-slate-800 border-2 border-slate-700/80 hover:border-blue-500 active:scale-[0.98] transition shadow-lg relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-28 h-28 bg-blue-600/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+              <div class="w-24 h-14 rounded-2xl bg-[#004785] p-1.5 flex items-center justify-center shadow-md shrink-0 border border-blue-400/40"><svg class="h-8 w-auto" viewBox="0 0 160 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="160" height="50" rx="8" fill="#004785"/>
+  <!-- XL in heavy white -->
+  <path d="M16 12 L28 25 L16 38 H25 L32 29.5 L39 38 H48 L36 25 L48 12 H39 L32 20.5 L25 12 H16 Z" fill="#FFFFFF"/>
+  <path d="M53 12 H62 V31 H78 V38 H53 V12 Z" fill="#FFFFFF"/>
+  <!-- Dash in gold -->
+  <rect x="82" y="23" width="9" height="5" rx="1" fill="#CFBA81"/>
+  <!-- BYG in gold/orange -->
+  <path d="M96 12 H107 C112 12 115 14 115 17.5 C115 19.5 113.5 21.5 110.5 22.5 C114 23.5 116 26 116 30 C116 35 112 38 106.5 38 H96 V12 Z M104 18 V22 H106.5 C108.5 22 109.5 21 109.5 19.5 C109.5 18 108.5 18 106.5 18 H104 Z M104 28 V32 H107 C109.5 32 110.5 31 110.5 29.5 C110.5 28 109.5 28 107 28 H104 Z" fill="#CFBA81"/>
+  <path d="M119 12 L125 25 V38 H131 V25 L137 12 H130 L128 18.5 L126 12 H119 Z" fill="#CFBA81"/>
+  <path d="M140 25 C140 17 144 12 151 12 C156 12 158.5 14.5 159.5 18 L154 19.5 C153.5 18 152.5 17 151 17 C147.5 17 146 20.5 146 25 C146 29.5 147.5 33 151 33 C153 33 154 32 154.5 30.5 H150.5 V26.5 H160 V33 C158 36.5 155 38 151 38 C144 38 140 33 140 25 Z" fill="#CFBA81"/>
+</svg></div>
+              <div>
+                <div class="flex items-center space-x-2">
+                  <h3 class="text-lg font-bold text-white group-hover:text-blue-400 transition">XL-BYG</h3>
+                  <span class="bg-blue-500/20 text-blue-300 text-[10px] font-bold px-2 py-0.5 rounded-md border border-blue-500/30">${supXl.tag}</span>
+                </div>
+                <p class="text-xs text-slate-400 mt-1">${supXl.desc}</p>
+                <div class="text-[11px] text-[#52A633] font-medium mt-0.5 flex flex-wrap items-center gap-x-2">
+                  <span>👤 ${escapeHtml(supXl.seller || 'Thomas Møller')}</span>
+                  <span>📞 ${escapeHtml(supXl.phone || '+45 86 19 22 30')}</span>
+                </div>
+                <div class="text-[10px] text-slate-500 font-mono mt-0.5 truncate">Ordre: ${escapeHtml(supXl.email)}</div>
+              </div>
+            </div>
+            <div class="w-8 h-8 rounded-full bg-slate-700/50 flex items-center justify-center text-slate-400 group-hover:text-white group-hover:bg-blue-600 transition shrink-0 ml-2">
+              <i data-lucide="chevron-right" class="w-5 h-5"></i>
+            </div>
+          </div>
+        </button>
+
+        <!-- WÜRTH -->
+        <button onclick="selectSupplier('Würth')"
+          class="supplier-card group text-left p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-red-950/30 via-slate-800 to-slate-800/90 border-2 border-red-500/60 hover:border-red-400 active:scale-[0.98] transition shadow-xl relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-28 h-28 bg-red-600/20 rounded-full blur-2xl -mr-10 -mt-10"></div>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+              <div class="w-20 h-14 rounded-2xl bg-white p-2 flex items-center justify-center shadow-md shrink-0 border border-slate-200">
+                  <svg class="h-9 w-auto" viewBox="0 0 1701 365" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#111827" d="m 1185,304 h 73 l -52,-90 c 29,-12 45,-36 45,-66 0,-46 -30,-76 -90,-76 h -115 v 232 h 63 v -81 h 32 z m 2,-156 c 0,16 -11,28 -35,28 h -44 v -56 h 44 c 24,0 35,12 35,28 z M 933,137 v 74 c 0,34 -16,45 -38,45 -21,0 -38,-12 -38,-45 v -75 h -64 v 78 c 0,61 34,95 103,95 69,0 102,-34 102,-94 V 137 Z M 857,116 V 72 h -64 v 44 z m 76,0 h 64 V 72 H 933 Z M 527,226 494,72 h -64 l 59,232 h 68 l 40,-152 40,152 h 68 L 764,72 H 700 L 667,226 627,72 h -60 z m 1109,-71 h -78 V 72 h -64 v 232 h 64 v -97 h 78 v 97 h 65 V 72 h -65 z m -302,-32 v 182 h 64 V 123 h 60 V 72 h -184 v 51 z"/>
+                    <path fill="#CC0000" d="M 333,143 H 0 V 0 h 139 v 56 h 56 V 0 H 334 V 143 Z M 194,309 v 56 c 80,-15 139,-84 139,-162 v -3 H 0 v 3 c 0,77 59,146 139,161 v -56 h 55 z"/>
+                  </svg>
+                </div>
+              <div>
+                <div class="flex items-center space-x-2">
+                  <h3 class="text-lg font-bold text-white group-hover:text-red-400 transition">Würth</h3>
+                  <span class="bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider">${supWurth.tag}</span>
+                </div>
+                <p class="text-xs font-bold text-[#52A633] mt-0.5">${supWurth.desc}</p>
+                <div class="text-[11px] text-slate-300 mt-0.5 flex flex-wrap items-center gap-x-2">
+                  <span>👤 ${escapeHtml(supWurth.seller || 'Morten Lind')}</span>
+                  <span>📞 ${escapeHtml(supWurth.phone || '+45 70 20 30 40')}</span>
+                </div>
+                <div class="text-[10px] text-slate-400 font-mono mt-0.5 truncate">Ordre: ${escapeHtml(supWurth.email)}</div>
+              </div>
+            </div>
+            <div class="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center shadow-lg transition shrink-0 ml-2">
+              <i data-lucide="chevron-right" class="w-5 h-5"></i>
+            </div>
+          </div>
+        </button>
+      `;
+      lucide.createIcons();
+    }
+
+    // ==========================================
+    // ADMIN SUB-TABS (Krav 1 & 3)
+    // ==========================================
+    function switchAdminTab(tab) {
+      const viewInvoices = document.getElementById('admin-view-invoices');
+      const viewSuppliers = document.getElementById('admin-view-suppliers');
+      const viewUsers = document.getElementById('admin-view-users');
+
+      const btnInvoices = document.getElementById('admin-tab-btn-invoices');
+      const btnSuppliers = document.getElementById('admin-tab-btn-suppliers');
+      const btnUsers = document.getElementById('admin-tab-btn-users');
+
+      // Hide all
+      [viewInvoices, viewSuppliers, viewUsers].forEach(v => { if (v) v.classList.add('hidden'); });
+      [btnInvoices, btnSuppliers, btnUsers].forEach(b => {
+        if (b) b.className = 'flex items-center space-x-2 px-4 py-2.5 rounded-xl font-bold text-xs transition text-slate-400 hover:text-white hover:bg-slate-800';
+      });
+
+      if (tab === 'suppliers') {
+        if (viewSuppliers) viewSuppliers.classList.remove('hidden');
+        if (btnSuppliers) btnSuppliers.className = 'flex items-center space-x-2 px-4 py-2.5 rounded-xl font-bold text-xs transition bg-[#00864E] text-white shadow';
+        renderAdminSuppliers();
+      } else if (tab === 'users') {
+        if (viewUsers) viewUsers.classList.remove('hidden');
+        if (btnUsers) btnUsers.className = 'flex items-center space-x-2 px-4 py-2.5 rounded-xl font-bold text-xs transition bg-[#00864E] text-white shadow';
+        renderAdminUsers();
+      } else {
+        // invoices
+        if (viewInvoices) viewInvoices.classList.remove('hidden');
+        if (btnInvoices) btnInvoices.className = 'flex items-center space-x-2 px-4 py-2.5 rounded-xl font-bold text-xs transition bg-[#00864E] text-white shadow';
+      }
+      lucide.createIcons();
+    }
+
+    function goToAdminTab(tab) {
+      toggleAdminView(true);
+      switchAdminTab(tab);
+    }
+
+    // ==========================================
     // INITIALIZATION
     // ==========================================
     document.addEventListener('DOMContentLoaded', () => {
       renderCasesList(DEFAULT_CASES);
+      renderSupplierSelectionCards();
+      renderUserDropdown();
+      updateActiveUserUI();
       renderAdminDashboard();
       updateHistoryBadge();
       initSpeechRecognition();
@@ -1599,12 +2468,12 @@
       lucide.createIcons();
     }
 
-    function toggleAdminView() {
+    function toggleAdminView(forceShow) {
       const shell = document.getElementById('app-shell');
       const adminScreen = document.getElementById('screen-admin');
       const isCurrentlyAdmin = !adminScreen.classList.contains('hidden');
 
-      if (isCurrentlyAdmin) {
+      if (!forceShow && isCurrentlyAdmin) {
         // Return to order view
         setAppMode(appMode || 'order');
       } else {
@@ -1616,8 +2485,9 @@
         document.getElementById('progress-bar-wrapper').classList.add('hidden');
         document.getElementById('active-summary-banner').classList.add('hidden');
 
-        document.getElementById('header-main-title').textContent = 'Marcus Dashboard';
-        document.getElementById('header-mode-badge').textContent = 'Admin & Kontrol';
+        const activeUser = getActiveUser();
+        document.getElementById('header-main-title').textContent = activeUser.role === 'Projektleder' ? 'Projektleder Dashboard' : 'Admin & Kontrol';
+        document.getElementById('header-mode-badge').textContent = 'Admin Panel';
 
         renderAdminDashboard();
         switchScreen('screen-admin');
@@ -1814,20 +2684,29 @@
     // ==========================================
     // STEP 2: SUPPLIER SELECTION LOGIC
     // ==========================================
-    function selectSupplier(name, email, desc) {
-      currentFlow.supplier = { name, email, desc };
+    function selectSupplier(name, fallbackEmail, fallbackDesc) {
+      const suppliers = getStoredSuppliers();
+      const sup = suppliers[name] || { name, email: fallbackEmail, desc: fallbackDesc };
+      
+      currentFlow.supplier = {
+        name: sup.name,
+        email: sup.email || fallbackEmail,
+        desc: sup.desc || fallbackDesc,
+        seller: sup.seller,
+        phone: sup.phone
+      };
 
       if (appMode === 'order') {
         // Prepare Order Form
-        document.getElementById('order-sag-text').textContent = currentFlow.case.number + ' - ' + currentFlow.case.name;
-        document.getElementById('order-leverandor-text').textContent = name;
-        setSupplierIcon('order-leverandor-icon-box', name);
+        document.getElementById('order-sag-text').textContent = currentFlow.case ? (currentFlow.case.number + ' - ' + currentFlow.case.name) : 'Sag 2401';
+        document.getElementById('order-leverandor-text').textContent = sup.name;
+        setSupplierIcon('order-leverandor-icon-box', sup.name);
         switchScreen('screen-order');
       } else {
         // Prepare Return Form
-        document.getElementById('return-sag-text').textContent = currentFlow.case.number + ' - ' + currentFlow.case.name;
-        document.getElementById('return-leverandor-text').textContent = name;
-        setSupplierIcon('return-leverandor-icon-box', name);
+        document.getElementById('return-sag-text').textContent = currentFlow.case ? (currentFlow.case.number + ' - ' + currentFlow.case.name) : 'Sag 2401';
+        document.getElementById('return-leverandor-text').textContent = sup.name;
+        setSupplierIcon('return-leverandor-icon-box', sup.name);
         switchScreen('screen-return-form');
       }
     }
@@ -2499,6 +3378,14 @@
       currentFlow.phone = document.getElementById('order-phone').value;
       currentFlow.note = document.getElementById('order-note').value;
       currentFlow.timestamp = new Date().toISOString();
+      const activeUser = getActiveUser();
+      currentFlow.signature = generateEmailSignature({
+        name: currentFlow.sender,
+        phone: currentFlow.phone,
+        title: activeUser.title,
+        role: activeUser.role,
+        email: activeUser.email
+      });
 
       const randomCode = Math.floor(1000 + Math.random() * 9000);
       currentFlow.id = `NTV-2026-${randomCode}`;
@@ -2531,6 +3418,14 @@
       currentFlow.phone = document.getElementById('return-phone').value;
       currentFlow.timestamp = new Date().toISOString();
       currentFlow.type = 'return';
+      const activeUser = getActiveUser();
+      currentFlow.signature = generateEmailSignature({
+        name: currentFlow.sender,
+        phone: currentFlow.phone,
+        title: activeUser.title,
+        role: activeUser.role,
+        email: activeUser.email
+      });
 
       // Required unique Return ID: RET-2026-XXXX
       const randomCode = Math.floor(1000 + Math.random() * 9000);
@@ -2575,6 +3470,19 @@
       const headerTitle = document.getElementById('receipt-header-title');
       const detailTypeLabel = document.getElementById('receipt-detail-type-label');
       const simBtn = document.getElementById('receipt-simulation-cta');
+
+      // Populate personal email signature (Krav 2)
+      const sigEl = document.getElementById('receipt-sender-signature');
+      if (sigEl) {
+        const sigText = item.signature || generateEmailSignature({
+          name: item.sender || 'Marcus Dalland Braae',
+          phone: item.phone || '+45 22 88 14 00',
+          title: 'Projektleder',
+          role: 'Projektleder',
+          email: 'mdb@nortvig.dk'
+        });
+        sigEl.textContent = sigText;
+      }
 
       if (item.type === 'return') {
         heroIconBox.className = 'w-20 h-20 bg-amber-500/20 text-amber-400 rounded-3xl border-2 border-amber-500/40 flex items-center justify-center mx-auto mb-3 shadow-xl shadow-amber-950/50 glow-pulse';
@@ -2819,6 +3727,11 @@
     // ADMIN DASHBOARD & CONTROLS (MARCUS VIEW)
     // ==========================================
     function renderAdminDashboard() {
+      renderAdminUsers();
+      renderAdminSuppliers();
+      const tabInvoiceCount = document.getElementById('admin-tab-invoice-count');
+      if (tabInvoiceCount) tabInvoiceCount.textContent = adminDiscrepancies.filter(d => !d.rejected).length;
+
       // 1. Render Discrepancies (Fejlfakturaer)
       const discList = document.getElementById('discrepancy-list');
       const discCounter = document.getElementById('discrepancy-counter-tag');
@@ -2965,12 +3878,15 @@
     function rejectInEkomplet(discId, invoiceNo) {
       const match = adminDiscrepancies.find(d => d.id === discId);
       const todayStr = '21.09.2026';
+      const activeUser = getActiveUser();
+      const userName = activeUser ? activeUser.name : 'Marcus Dalland Braae';
+
       if (match) {
         match.rejected = true;
         match.status = 'Afvist i E-komplet / Afventer kreditnota fra leverandør';
-        match.note = `Afvist af Marcus Dalland Braae ${todayStr}: Mængdeafvigelse afvist mod håndværkerens app-bestilling. Afventer kreditnota for differens (${match.priceDiff}).`;
+        match.note = `Afvist af ${userName} den ${todayStr}: Mængdeafvigelse afvist mod håndværkerens app-bestilling. Afventer kreditnota for differens (${match.priceDiff}).`;
       }
-      showToast('Faktura afvist i E-komplet', `${invoiceNo} er sat til 'Afvist i E-komplet'. Fakturanote opdateret: Afvist af Marcus Dalland Braae ${todayStr}.`);
+      showToast('Faktura afvist i E-komplet', `${invoiceNo} afvist. Faktura-note i E-komplet: Afvist af ${userName} den ${todayStr}`);
       renderAdminDashboard();
     }
 
